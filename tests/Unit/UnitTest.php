@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\User;
+use App\Follow;
 use App\Post;
 use App\Comment;
 use Illuminate\Database\QueryException;
@@ -113,7 +114,16 @@ class UnitTest extends TestCase
         $this->assertEquals(Comment::count(), 0);
     }
 
+    public function testFollowUser()
+    {
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+        $follow = factory(Follow::class)->create();
 
+        $this->assertTrue($follow->following_user_id == $user1->id || $follow->following_user_id == $user2->id);
+        $this->assertTrue($follow->followed_user_id == $user1->id || $follow->followed_user_id == $user2->id);
+        $this->assertEquals(Follow::count(), 1);
 
-    
+    }
+ 
 }

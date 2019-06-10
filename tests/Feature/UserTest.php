@@ -10,6 +10,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
 use App\User;
+use App\Follow;
 use App\Post;
 use App\Comment;
 
@@ -96,6 +97,71 @@ class UserTest extends TestCase
         $this->assertEquals(User::find(2)->email, $user2->email);
 
         $response->assertStatus(302);
+    }
+
+    public function testFollow()
+    {
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+
+        $response = $this->actingAs($user1)->post("/profiles", [
+            'user' => $user2->id,
+        ]);
+
+        $this->assertEquals(Follow::count(), 1);
+    }
+
+    public function testFailedFollow()
+    {
+        $user = factory(User::class)->create();
+
+        $response = $this->post("/profiles", [
+            'user' => $user->id,
+        ]);
+
+        $this->assertEquals(Follow::count(), 0);
+        $response->assertRedirect('/login');
+    }
+
+    public function testFollowingSelf()
+    {
+        $user = factory(User::class)->create();
+
+        $response = $this->actingAs($user)->post("/profiles", [
+            'user' => $user->id,
+        ]);
+
+        $this->assertEquals(Follow::count(), 0);
+    }
+
+    public function testDeleteFollow()
+    {
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+
+        $response = $this->actingAs($user1)->post("/profiles", [
+            'user' => $user2->id,
+        ]);
+
+        $this->assertEquals(Follow::count(), 1);
+        $response = $this->actingAs($user1)->delete("/profiles/1");
+        $this->assertEquals(Follow::count(), 0);
+
+    }
+
+    public function testFailedDeleteFollow()
+    {
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+
+        $response = $this->actingAs($user1)->post("/profiles", [
+            'user' => $user2->id,
+        ]);
+
+        $this->assertEquals(Follow::count(), 1);
+        $response = $this->actingAs($user2)->delete("/profiles/1");
+        $this->assertEquals(Follow::count(), 1);
+
     }
     
 }
