@@ -1,0 +1,121 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Post;
+use Auth;
+
+
+class PostController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index', 'show']] );
+        
+    }
+
+    public function index()
+    {
+        $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
+        return view('post.index')->with('posts', $posts); 
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('post.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $post = new Post;
+        $post->user_id = Auth::user()->id;
+        $post->content = $request->content;
+        $post->save();
+        $request->session()->flash('status', 'Post successfully sent!');
+        return redirect('/posts');
+
+
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $post = Post::find($id);
+        $comments = $post->comments()->paginate(10);
+        return view('post.show')->with('post', $post)->with('comments', $comments);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+
+        
+        $post = Post::find($id);
+        if(isset($post) && $post->user_id == Auth::user()->id)
+        {
+            $post->delete();
+            session()->flash('status', 'Post successfully deleted!');
+        }
+
+        $previousPath = explode('/', url()->previous());
+        return is_numeric(end($previousPath)) ? redirect('/posts')  : back();
+    }
+
+    public function followingPosts()
+    {
+        $posts = Post::select('posts.*')->join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
+        ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
+        return view('post.index')->with('posts', $posts)->with('followingPosts', 1); 
+    }
+}
