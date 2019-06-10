@@ -19,20 +19,14 @@ class UnitTest extends TestCase
 {
 
     use DatabaseMigrations;
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
-    /** @test */
-    public function createUser()
+
+    public function testCreateUser()
     {
         factory(User::class)->create();   //create faker data
         $this->assertEquals(User::where('id', 1)->count(), 1); 
     }
 
-    /** @test */
-    public function duplicateEmail()
+    public function testDuplicateEmail()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
         $data = factory(User::class)->create();   //create faker data
@@ -41,16 +35,15 @@ class UnitTest extends TestCase
         User::where('id', 2)->update(['email'=> $data->email]);
     }
 
-    /** @test */
-    public function updateUserNullEmail()
+
+    public function testUpdateUserNullEmail()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
         $data = factory(User::class)->create();   //create faker data
         User::where('id', 1)->update(['email'=> null]); //update faker data to be null
     }
 
-    /** @test */
-    public function deleteZeroUsersByEmail()
+    public function testDeleteZeroUsersByEmail()
     {
         
         factory(User::class, 100)->create();   //create faker data
@@ -60,8 +53,7 @@ class UnitTest extends TestCase
         $this->assertEquals(User::where('id','<' ,101)->where('email',$data->email)->delete(), 0); 
     }
 
-    /** @test */
-    public function deleteUserWithPosts()
+    public function testDeleteUserWithPosts()
     {
         $data = factory(User::class)
             ->create()
@@ -85,8 +77,7 @@ class UnitTest extends TestCase
         
     }
     
-    /** @test */
-    public function deleteUserWithPostsAndComments()
+    public function testDeleteUserWithPostsAndComments()
     {
         //Create user with post
         $data = factory(User::class)
