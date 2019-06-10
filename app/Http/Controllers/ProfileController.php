@@ -52,11 +52,14 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        $follow = new Follow;
-        $follow->following_user_id = Auth::user()->id;
-        $follow->followed_user_id = $request->user;
-        $follow->save();
-        session()->flash('status', 'User succesfully followed!');
+        if(Auth::user()->id != $request->user)
+        {
+            $follow = new Follow;
+            $follow->following_user_id = Auth::user()->id;
+            $follow->followed_user_id = $request->user;
+            $follow->save();
+            session()->flash('status', 'User succesfully followed!');
+        }
         return back();
     }
 
@@ -118,8 +121,9 @@ class ProfileController extends Controller
      */
     public function destroy($id)
     {
+        
         $follow = Follow::find($id);
-        if(isset($follow) && $follow->following_user_id === Auth::user()->id)
+        if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
             session()->flash('status', 'User succesfully Unfollowed!');
