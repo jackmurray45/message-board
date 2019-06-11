@@ -34,7 +34,7 @@ class PostTest extends TestCase
     public function testFailedShowPost()
     {
         $response = $this->get('/posts/1');
-        $response->assertStatus(500);
+        $response->assertStatus(404);
     }
 
     public function testPostRedirect()

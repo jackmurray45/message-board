@@ -39,7 +39,7 @@ class UserTest extends TestCase
     public function testFailedShowProfile()
     {
         $response = $this->get('/profiles/1');
-        $response->assertStatus(500);
+        $response->assertStatus(404);
     }
 
 

@@ -35,6 +35,8 @@ class CommentTest extends TestCase
             'content' => 'This is test content',
             'post' => $post
         ]);
+        
+        
 
         $this->assertEquals(Comment::count(), 1);
     }
