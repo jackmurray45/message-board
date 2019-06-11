@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Request as UrlRequest;
 use Illuminate\Http\Request;
+use App\Http\Resources\Post as PostResource;
 use App\Post;
 use Auth;
 
@@ -15,16 +16,20 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+    
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']] );
+        $this->isApi = UrlRequest::segment(1) == 'api';
+    
         
     }
 
     public function index()
     {
         $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        return view('post.index')->with('posts', $posts); 
+        return !$this->isApi ? view('post.index')->with('posts', $posts) :  PostResource::collection($posts); 
     }
 
     /**
@@ -63,9 +68,9 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
         $comments = $post->comments()->paginate(10);
-        return view('post.show')->with('post', $post)->with('comments', $comments);
+        return !$this->isApi ? view('post.show')->with('post', $post)->with('comments', $comments) : new PostResource($post);
     }
 
     /**
@@ -101,7 +106,7 @@ class PostController extends Controller
     {
 
         
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
         if(isset($post) && $post->user_id == Auth::user()->id)
         {
             $post->delete();

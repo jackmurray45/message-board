@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Request as UrlRequest;
 use Illuminate\Http\Request;
 use App\Comment;
+use App\Http\Resources\Comment as CommentResource;
 use Auth;
 
 class CommentController extends Controller
@@ -11,8 +13,8 @@ class CommentController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth');
-        
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+        $this->isApi = UrlRequest::segment(1) == 'api';
     }
 
     /**
@@ -20,9 +22,19 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
     public function index()
     {
-        //
+        if($this->isApi)
+        {
+            $comments = Comment::orderBy('created_at', 'desc')->paginate(100);
+            return CommentResource::collection($comments);
+        }
+        else
+        {
+            return redirect('/');
+        }
     }
 
     /**
@@ -60,7 +72,15 @@ class CommentController extends Controller
      */
     public function show($id)
     {
-        //
+        if($this->isApi)
+        {
+            $comment = Comment::findOrFail($id);
+            return new CommentResource($comment);
+        }
+        else
+        {
+            return redirect('/');
+        }
     }
 
     /**

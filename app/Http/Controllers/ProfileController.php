@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Request as UrlRequest;
 use Illuminate\Http\Request;
 use App\User;
 use App\Follow;
 Use App\Post;
+use App\Http\Resources\Profile as ProfileResource;
 use Auth;
 use Hash;
 use Illuminate\Support\MessageBag;
@@ -17,6 +19,7 @@ class ProfileController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']] );
+        $this->isApi = UrlRequest::segment(1) == 'api';
        
     }
 
@@ -39,7 +42,7 @@ class ProfileController extends Controller
         }
         
         
-        return view('profile.index')->with('users', $users)->with('followMap', $followMap);
+        return !$this->isApi ? view('profile.index')->with('users', $users)->with('followMap', $followMap)  :  ProfileResource::collection($users);
     }
 
     
@@ -71,7 +74,7 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
         $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'DESC')->paginate(10);
         $followId = null;
         if(!Auth::guest())
@@ -82,7 +85,7 @@ class ProfileController extends Controller
                 $followId = $follow->id;
             }
         }
-        return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
+        return !$this->isApi ? view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId) : new ProfileResource($user) ;
     }
 
 
@@ -101,7 +104,7 @@ class ProfileController extends Controller
             'name' => 'required|max:255'
         ]);
 
-        $user = User::find($id);
+        $user = User::findOrFail($id);
         if($user->id === Auth::user()->id)
         {
             $user->name = $request->name;
@@ -122,7 +125,7 @@ class ProfileController extends Controller
     public function destroy($id)
     {
         
-        $follow = Follow::find($id);
+        $follow = Follow::findOrFail($id);
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
