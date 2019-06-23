@@ -24,3 +24,7 @@ Route::resource('posts', 'PostController');
 Route::resource('profiles', 'ProfileController');
 Route::resource('comments', 'CommentController');
 
+Route::post('/register', 'Auth\ApiAuthController@register');
+Route::post('/login', 'Auth\ApiAuthController@login');
+Route::post('/logout', 'Auth\ApiAuthController@logout');
+
