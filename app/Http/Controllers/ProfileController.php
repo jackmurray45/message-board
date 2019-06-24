@@ -18,9 +18,16 @@ class ProfileController extends Controller
 
     public function __construct()
     {
+
+        if($this->isApi = UrlRequest::segment(1) == 'api')
+        {
+            auth()->setDefaultDriver('api');
+        }
+        else
+        {
+            auth()->setDefaultDriver('web');
+        }
         $this->middleware('auth', ['except' => ['index', 'show']] );
-        $this->isApi = UrlRequest::segment(1) == 'api';
-       
     }
 
     /**

@@ -41,6 +41,11 @@ class ApiAuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
+    public function me()
+    {
+        return response()->json(auth('api')->user());
+    }
+
     protected function respondWithToken($token)
     {
         return response()->json([
