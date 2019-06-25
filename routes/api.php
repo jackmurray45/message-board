@@ -19,8 +19,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-
+Route::get('posts/following', 'PostController@followingPosts')->name('posts.following');
 Route::resource('posts', 'PostController');
+Route::get('profiles/following', 'ProfileController@followingProfiles')->name('profiles.following');
 Route::resource('profiles', 'ProfileController');
 Route::resource('comments', 'CommentController');
 
