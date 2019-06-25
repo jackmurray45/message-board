@@ -67,7 +67,15 @@ class CommentController extends Controller
         $comment->post_id = $request->post;
         $comment->user_id = Auth::user()->id;
         $comment->save();
-        session()->flash('status', 'Comment successfully posted');
+
+        if($this->isApi)
+        {
+            return response()->json(['message' => 'Comment successfully posted', 'id' => $comment->id]);
+        }
+        else
+        {
+            session()->flash('status', 'Comment successfully posted!');  
+        } 
         return back();
     }
 
@@ -126,7 +134,14 @@ class CommentController extends Controller
         if(Auth::user()->id == $comment->user_id)
         {
             $comment->delete();
-            session()->flash('status', 'Comment successfully deleted');
+            if($this->isApi)
+            {
+                return response()->json(['message' => 'Comment successfully deleted']);
+            }
+            else
+            {
+                session()->flash('status', 'Comment successfully deleted!');
+            }   
         }
         return back();
 

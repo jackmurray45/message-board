@@ -62,15 +62,35 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        if(Auth::user()->id != $request->user)
+        if(Auth::user()->id != $request->user && User::find($request->user))
         {
             $follow = new Follow;
             $follow->following_user_id = Auth::user()->id;
             $follow->followed_user_id = $request->user;
             $follow->save();
-            session()->flash('status', 'User succesfully followed!');
+            if($this->isApi)
+            {
+                return response()->json(['message' => 'User successfully followed', 'id' => $follow->id]);
+            }
+            else
+            {
+                session()->flash('status', 'User successfully followed!');
+                return back();
+            }  
         }
-        return back();
+        else
+        {
+            if($this->isApi)
+            {
+                return response()->json(['message' => 'Failed']);
+            }
+            else
+            {
+                session()->flash('status', 'Error following user');
+                return back();
+            } 
+        }
+        
     }
 
     /**
@@ -105,21 +125,31 @@ class ProfileController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    {        
         $request->validate([
             'email' => "unique:users,email,$id,id",
             'name' => 'required|max:255'
         ]);
 
         $user = User::findOrFail($id);
-        if($user->id === Auth::user()->id)
+        if($user->id == Auth::user()->id)
         {
+            
             $user->name = $request->name;
             $user->email = $request->email;
             $user->bio = $request->bio;
             $user->save();
-            session()->flash('status', 'Your Account has been succesfully updated!');
+            if($this->isApi)
+            {
+                
+                return response()->json(['message' => 'User successfully updated']);
+            }
+            else
+            {
+                session()->flash('status', 'Your Account has been successfully updated!');    
+            }
         }
+        
         return back();
     }
 
@@ -131,12 +161,18 @@ class ProfileController extends Controller
      */
     public function destroy($id)
     {
-        
         $follow = Follow::findOrFail($id);
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
-            session()->flash('status', 'User succesfully Unfollowed!');
+            if($this->isApi)
+            {
+                return response()->json(['message' => 'User successfully unfollowed']);
+            }
+            else
+            {
+                session()->flash('status', 'User successfully Unfollowed!');   
+            }  
         }
         return back();
     }
@@ -144,22 +180,20 @@ class ProfileController extends Controller
     public function myProfile()
     {
         $user = Auth::user();
-        return view('profile.me')->with('user', $user)->with('posts', $user->posts);
+        return !$this->isApi ? view('profile.me')->with('user', $user)->with('posts', $user->posts) : new ProfileResource($user);
     }
 
     public function followingProfiles()
     {
-
         $followCollection = User::select('users.*', 'follows.id as follow_id')->join('follows', 'users.id', '=', 'follows.followed_user_id')
         ->where('following_user_id', '=', Auth::user()->id)->orderBy('follows.created_at', 'DESC')->paginate(20);
-
 
         $followMap = [];
         foreach($followCollection as $follow)
         {
             $followMap[$follow->id] = $follow->follow_id;
         }
-        return view('profile.index')->with('users', $followCollection)->with('followMap', $followMap);
+        return !$this->isApi ? view('profile.index')->with('users', $followCollection)->with('followMap', $followMap) : new ProfileResource($followCollection);
     }
 
     public function updateAuthUserPassword(Request $request)
@@ -173,14 +207,28 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if (!Hash::check($request->current, $user->password)) {
-            $errors = new MessageBag;
-            $errors->add('password', 'Current password does not match');
-            return redirect('profiles/me')->withErrors($errors);
+            if($this->isApi)
+            {
+                return response()->json(['message' => 'Failed. Current password does not match']);
+            }
+            else
+            {
+                $errors = new MessageBag;
+                $errors->add('password', 'Current password does not match');
+                return redirect('profiles/me')->withErrors($errors);
+            }   
         }
 
         $user->password = Hash::make($request->password);
         $user->save();
-        session()->flash('status', 'Password succesfully changed!');
+        if($this->isApi)
+        {
+            return response()->json(['message' => 'Password successfully updated']);
+        }
+        else
+        {
+            session()->flash('status', 'Password succesfully changed!'); 
+        }
         return back();
     }
 }
