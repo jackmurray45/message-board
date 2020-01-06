@@ -11,7 +11,7 @@
                 </div>
                 <div class="modal-body">
                     <div class = "input-group">      
-                        {!! Form::textarea('content', '', ['class' => 'form-control', 'placeholder' => 'Today I went to...']) !!}
+                        {!! Form::textarea('content', '', ['class' => 'form-control', 'placeholder' => 'Today I went to...', 'required']) !!}
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">

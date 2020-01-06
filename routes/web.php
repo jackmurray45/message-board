@@ -11,14 +11,14 @@
 |
 */
 
-Route::get('/', 'HomeController@index')->name('home.index');
-Route::get('posts/following', 'PostController@followingPosts')->name('posts.following');
-Route::resource('posts', 'PostController');
-Route::get('profiles/following', 'ProfileController@followingProfiles')->name('profiles.following');
-Route::get('profiles/me', 'ProfileController@myProfile')->name('profiles.me');
-Route::post('profile/me', 'ProfileController@updateAuthUserPassword')->name('profiles.password');
-Route::resource('profiles', 'ProfileController');
-Route::resource('comments', 'CommentController');
+Route::get('/', 'web\HomeController@index')->name('home.index');
+Route::get('posts/following', 'web\PostController@followingPosts')->name('posts.following');
+Route::resource('posts', 'web\PostController');
+Route::get('profiles/following', 'web\ProfileController@followingProfiles')->name('profiles.following');
+Route::get('profiles/me', 'web\ProfileController@myProfile')->name('profiles.me');
+Route::post('profile/me', 'web\ProfileController@updateAuthUserPassword')->name('profiles.password');
+Route::resource('profiles', 'web\ProfileController');
+Route::resource('comments', 'web\CommentController');
 
 
 
@@ -26,4 +26,4 @@ Route::resource('comments', 'CommentController');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'web\HomeController@index')->name('home');

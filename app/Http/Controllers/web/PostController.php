@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\web;
+
 use Request as UrlRequest;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\Post as PostResource;
 use App\Post;
@@ -20,21 +22,13 @@ class PostController extends Controller
 
     public function __construct()
     {
-        if($this->isApi = UrlRequest::segment(1) == 'api')
-        {
-            auth()->setDefaultDriver('api');
-        }
-        else
-        {
-            auth()->setDefaultDriver('web');
-        }
         $this->middleware('auth', ['except' => ['index', 'show']]);
     }
 
     public function index()
     {
         $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        return !$this->isApi ? view('post.index')->with('posts', $posts) :  PostResource::collection($posts); 
+        return view('post.index')->with('posts', $posts);
     }
 
     /**
@@ -55,19 +49,19 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate([
+            'content' => "required"
+        ]);
+
+        
         $post = new Post;
         $post->user_id = Auth::user()->id;
         $post->content = $request->content;
         $post->save();
-        if($this->isApi)
-        {
-            return response()->json(['message' => 'Post successfully sent', 'id' => $post->id]);
-        }
-        else
-        {
-            session()->flash('status', 'Post successfully sent!');
-            return redirect('/posts');
-        }
+
+        session()->flash('status', 'Post successfully sent!');
+        return redirect('/posts');
 
     }
 
@@ -81,7 +75,8 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         $comments = $post->comments()->paginate(10);
-        return !$this->isApi ? view('post.show')->with('post', $post)->with('comments', $comments) : new PostResource($post);
+
+        return view('post.show')->with('post', $post)->with('comments', $comments);
     }
 
     /**
@@ -119,25 +114,16 @@ class PostController extends Controller
         if(isset($post) && $post->user_id == Auth::user()->id)
         {
             $post->delete();
-            if($this->isApi)
-            {
-                return response()->json(['message' => 'Post successfully deleted']);
-            }
-            else
-            {
-                session()->flash('status', 'Post successfully deleted!');
-            }
+            session()->flash('status', 'Post successfully deleted!');
         }
         $previousPath = explode('/', url()->previous());
         return is_numeric(end($previousPath)) ? redirect('/posts')  : back();
-
-        
     }
 
     public function followingPosts()
     {
         $posts = Post::select('posts.*')->join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
         ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
-        return !$this->isApi ? view('post.index')->with('posts', $posts)->with('followingPosts', 1) : new PostResource($posts);
+        return view('post.index')->with('posts', $posts)->with('followingPosts', 1);
     }
 }

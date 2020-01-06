@@ -13,19 +13,13 @@ use Illuminate\Http\Request;
 |
 */
 
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-
-Route::get('posts/following', 'PostController@followingPosts')->name('posts.following');
-Route::resource('posts', 'PostController');
-Route::get('profiles/following', 'ProfileController@followingProfiles')->name('profiles.following');
-Route::get('profiles/me', 'ProfileController@myProfile')->name('profiles.me');
-Route::post('profile/me', 'ProfileController@updateAuthUserPassword')->name('profiles.password');
-Route::resource('profiles', 'ProfileController');
-Route::resource('comments', 'CommentController');
+Route::get('posts/following', 'api\PostController@followingPosts')->name('posts.following');
+Route::resource('posts', 'api\PostController');
+Route::get('profiles/following', 'api\ProfileController@followingProfiles')->name('profiles.following');
+Route::get('profiles/me', 'api\ProfileController@myProfile')->name('profiles.me');
+Route::post('profile/me', 'api\ProfileController@updateAuthUserPassword')->name('profiles.password');
+Route::resource('profiles', 'api\ProfileController');
+Route::resource('comments', 'api\CommentController');
 
 Route::post('/register', 'Auth\ApiAuthController@register');
 Route::post('/login', 'Auth\ApiAuthController@login');

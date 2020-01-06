@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\web;
 
 use Request as UrlRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\User;
 use App\Follow;
 Use App\Post;
@@ -18,15 +19,6 @@ class ProfileController extends Controller
 
     public function __construct()
     {
-
-        if($this->isApi = UrlRequest::segment(1) == 'api')
-        {
-            auth()->setDefaultDriver('api');
-        }
-        else
-        {
-            auth()->setDefaultDriver('web');
-        }
         $this->middleware('auth', ['except' => ['index', 'show']] );
     }
 
@@ -49,7 +41,7 @@ class ProfileController extends Controller
         }
         
         
-        return !$this->isApi ? view('profile.index')->with('users', $users)->with('followMap', $followMap)  :  ProfileResource::collection($users);
+        return view('profile.index')->with('users', $users)->with('followMap', $followMap);
     }
 
     
@@ -62,34 +54,23 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
+
+        $message = 'User successfully followed!';
+
         if(Auth::user()->id != $request->user && User::find($request->user))
         {
             $follow = new Follow;
             $follow->following_user_id = Auth::user()->id;
             $follow->followed_user_id = $request->user;
-            $follow->save();
-            if($this->isApi)
-            {
-                return response()->json(['message' => 'User successfully followed', 'id' => $follow->id]);
-            }
-            else
-            {
-                session()->flash('status', 'User successfully followed!');
-                return back();
-            }  
+            $follow->save(); 
         }
         else
         {
-            if($this->isApi)
-            {
-                return response()->json(['message' => 'Failed']);
-            }
-            else
-            {
-                session()->flash('status', 'Error following user');
-                return back();
-            } 
+            $message = "Error following user";
         }
+
+        session()->flash('status', $message);
+        return back();
         
     }
 
@@ -112,7 +93,7 @@ class ProfileController extends Controller
                 $followId = $follow->id;
             }
         }
-        return !$this->isApi ? view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId) : new ProfileResource($user) ;
+        return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
     }
 
 
@@ -134,22 +115,13 @@ class ProfileController extends Controller
         $user = User::findOrFail($id);
         if($user->id == Auth::user()->id)
         {
-            
             $user->name = $request->name;
             $user->email = $request->email;
             $user->bio = $request->bio;
             $user->save();
-            if($this->isApi)
-            {
-                
-                return response()->json(['message' => 'User successfully updated']);
-            }
-            else
-            {
-                session()->flash('status', 'Your Account has been successfully updated!');    
-            }
+            session()->flash('status', 'Your Account has been successfully updated!');  
         }
-        
+
         return back();
     }
 
@@ -165,14 +137,7 @@ class ProfileController extends Controller
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
-            if($this->isApi)
-            {
-                return response()->json(['message' => 'User successfully unfollowed']);
-            }
-            else
-            {
-                session()->flash('status', 'User successfully Unfollowed!');   
-            }  
+            session()->flash('status', 'User successfully Unfollowed!'); 
         }
         return back();
     }
@@ -180,7 +145,7 @@ class ProfileController extends Controller
     public function myProfile()
     {
         $user = Auth::user();
-        return !$this->isApi ? view('profile.me')->with('user', $user)->with('posts', $user->posts) : new ProfileResource($user);
+        return view('profile.me')->with('user', $user)->with('posts', $user->posts);
     }
 
     public function followingProfiles()
@@ -193,7 +158,7 @@ class ProfileController extends Controller
         {
             $followMap[$follow->id] = $follow->follow_id;
         }
-        return !$this->isApi ? view('profile.index')->with('users', $followCollection)->with('followMap', $followMap) : new ProfileResource($followCollection);
+        return view('profile.index')->with('users', $followCollection)->with('followMap', $followMap);
     }
 
     public function updateAuthUserPassword(Request $request)
@@ -207,28 +172,14 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if (!Hash::check($request->current, $user->password)) {
-            if($this->isApi)
-            {
-                return response()->json(['message' => 'Failed. Current password does not match']);
-            }
-            else
-            {
-                $errors = new MessageBag;
-                $errors->add('password', 'Current password does not match');
-                return redirect('profiles/me')->withErrors($errors);
-            }   
+            $errors = new MessageBag;
+            $errors->add('password', 'Current password does not match');
+            return redirect('profiles/me')->withErrors($errors);  
         }
 
         $user->password = Hash::make($request->password);
         $user->save();
-        if($this->isApi)
-        {
-            return response()->json(['message' => 'Password successfully updated']);
-        }
-        else
-        {
-            session()->flash('status', 'Password succesfully changed!'); 
-        }
+        session()->flash('status', 'Password succesfully changed!'); 
         return back();
     }
 }

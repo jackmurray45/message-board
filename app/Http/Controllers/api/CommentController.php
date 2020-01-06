@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use Request as UrlRequest;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Comment;
 use App\Http\Resources\Comment as CommentResource;
@@ -13,15 +14,7 @@ class CommentController extends Controller
 
     public function __construct()
     {
-        if($this->isApi = UrlRequest::segment(1) == 'api')
-        {
-            auth()->setDefaultDriver('api');
-        }
-        else
-        {
-            auth()->setDefaultDriver('web');
-        }
-        $this->middleware('auth', ['except' => ['index', 'show']]);
+        $this->middleware('auth:api', ['except' => ['index', 'show']]);
     }
 
     /**
@@ -33,15 +26,9 @@ class CommentController extends Controller
 
     public function index()
     {
-        if($this->isApi)
-        {
-            $comments = Comment::orderBy('created_at', 'desc')->paginate(100);
-            return CommentResource::collection($comments);
-        }
-        else
-        {
-            return redirect('/');
-        }
+
+        $comments = Comment::orderBy('created_at', 'desc')->paginate(100);
+        return CommentResource::collection($comments);
     }
 
     /**
@@ -68,15 +55,7 @@ class CommentController extends Controller
         $comment->user_id = Auth::user()->id;
         $comment->save();
 
-        if($this->isApi)
-        {
-            return response()->json(['message' => 'Comment successfully posted', 'id' => $comment->id]);
-        }
-        else
-        {
-            session()->flash('status', 'Comment successfully posted!');  
-        } 
-        return back();
+        return response()->json(['message' => 'Comment successfully posted', 'id' => $comment->id]);
     }
 
     /**
@@ -87,15 +66,8 @@ class CommentController extends Controller
      */
     public function show($id)
     {
-        if($this->isApi)
-        {
-            $comment = Comment::findOrFail($id);
-            return new CommentResource($comment);
-        }
-        else
-        {
-            return redirect('/');
-        }
+        $comment = Comment::findOrFail($id);
+        return new CommentResource($comment);
     }
 
     /**
@@ -129,21 +101,11 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
-
         $comment = Comment::find($id);
         if(Auth::user()->id == $comment->user_id)
         {
             $comment->delete();
-            if($this->isApi)
-            {
-                return response()->json(['message' => 'Comment successfully deleted']);
-            }
-            else
-            {
-                session()->flash('status', 'Comment successfully deleted!');
-            }   
         }
-        return back();
-
+        return response()->json(['message' => 'Comment successfully deleted']);  
     }
 }
