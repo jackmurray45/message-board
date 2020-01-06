@@ -1,40 +1,33 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use Request as UrlRequest;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Comment;
-use App\Http\Resources\Comment as CommentResource;
+use App\Http\Resources\Post as PostResource;
+use App\Post;
 use Auth;
 
-class CommentController extends Controller
+
+class PostController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->middleware('auth', ['except' => ['index', 'show']]);
-        $this->isApi = UrlRequest::segment(1) == 'api';
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
 
+    public function __construct()
+    {
+        
+        $this->middleware('auth:api', ['except' => ['index', 'show']]);
+    }
 
     public function index()
     {
-        if($this->isApi)
-        {
-            $comments = Comment::orderBy('created_at', 'desc')->paginate(100);
-            return CommentResource::collection($comments);
-        }
-        else
-        {
-            return redirect('/');
-        }
+        $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
+        return PostResource::collection($posts); 
     }
 
     /**
@@ -44,7 +37,7 @@ class CommentController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -55,13 +48,17 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        $comment = new Comment;
-        $comment->content = $request->content;
-        $comment->post_id = $request->post;
-        $comment->user_id = Auth::user()->id;
-        $comment->save();
-        session()->flash('status', 'Comment successfully posted');
-        return back();
+
+        $request->validate([
+            'content' => 'required'
+        ]);
+
+        $post = new Post;
+        $post->user_id = Auth::user()->id;
+        $post->content = $request->content;
+        $post->save();
+
+        return response()->json(['message' => 'Post successfully sent', 'id' => $post->id]);
     }
 
     /**
@@ -72,15 +69,8 @@ class CommentController extends Controller
      */
     public function show($id)
     {
-        if($this->isApi)
-        {
-            $comment = Comment::findOrFail($id);
-            return new CommentResource($comment);
-        }
-        else
-        {
-            return redirect('/');
-        }
+        $post = Post::findOrFail($id);
+        return new PostResource($post);
     }
 
     /**
@@ -114,14 +104,18 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
-
-        $comment = Comment::find($id);
-        if(Auth::user()->id == $comment->user_id)
+        $post = Post::findOrFail($id);
+        if(isset($post) && $post->user_id == Auth::user()->id)
         {
-            $comment->delete();
-            session()->flash('status', 'Comment successfully deleted');
+            $post->delete();
         }
-        return back();
+        return response()->json(['message' => 'Post successfully deleted']);
+    }
 
+    public function followingPosts()
+    {
+        $posts = Post::select('posts.*')->join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
+        ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
+        return new PostResource($posts);
     }
 }

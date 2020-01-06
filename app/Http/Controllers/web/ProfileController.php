@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\web;
 
 use Request as UrlRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\User;
 use App\Follow;
 Use App\Post;
@@ -19,8 +20,6 @@ class ProfileController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']] );
-        $this->isApi = UrlRequest::segment(1) == 'api';
-       
     }
 
     /**
@@ -42,7 +41,7 @@ class ProfileController extends Controller
         }
         
         
-        return !$this->isApi ? view('profile.index')->with('users', $users)->with('followMap', $followMap)  :  ProfileResource::collection($users);
+        return view('profile.index')->with('users', $users)->with('followMap', $followMap);
     }
 
     
@@ -55,15 +54,24 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        if(Auth::user()->id != $request->user)
+
+        $message = 'User successfully followed!';
+
+        if(Auth::user()->id != $request->user && User::find($request->user))
         {
             $follow = new Follow;
             $follow->following_user_id = Auth::user()->id;
             $follow->followed_user_id = $request->user;
-            $follow->save();
-            session()->flash('status', 'User succesfully followed!');
+            $follow->save(); 
         }
+        else
+        {
+            $message = "Error following user";
+        }
+
+        session()->flash('status', $message);
         return back();
+        
     }
 
     /**
@@ -85,7 +93,7 @@ class ProfileController extends Controller
                 $followId = $follow->id;
             }
         }
-        return !$this->isApi ? view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId) : new ProfileResource($user) ;
+        return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
     }
 
 
@@ -98,21 +106,22 @@ class ProfileController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    {        
         $request->validate([
             'email' => "unique:users,email,$id,id",
             'name' => 'required|max:255'
         ]);
 
         $user = User::findOrFail($id);
-        if($user->id === Auth::user()->id)
+        if($user->id == Auth::user()->id)
         {
             $user->name = $request->name;
             $user->email = $request->email;
             $user->bio = $request->bio;
             $user->save();
-            session()->flash('status', 'Your Account has been succesfully updated!');
+            session()->flash('status', 'Your Account has been successfully updated!');  
         }
+
         return back();
     }
 
@@ -124,12 +133,11 @@ class ProfileController extends Controller
      */
     public function destroy($id)
     {
-        
         $follow = Follow::findOrFail($id);
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
-            session()->flash('status', 'User succesfully Unfollowed!');
+            session()->flash('status', 'User successfully Unfollowed!'); 
         }
         return back();
     }
@@ -142,10 +150,8 @@ class ProfileController extends Controller
 
     public function followingProfiles()
     {
-
         $followCollection = User::select('users.*', 'follows.id as follow_id')->join('follows', 'users.id', '=', 'follows.followed_user_id')
         ->where('following_user_id', '=', Auth::user()->id)->orderBy('follows.created_at', 'DESC')->paginate(20);
-
 
         $followMap = [];
         foreach($followCollection as $follow)
@@ -168,12 +174,12 @@ class ProfileController extends Controller
         if (!Hash::check($request->current, $user->password)) {
             $errors = new MessageBag;
             $errors->add('password', 'Current password does not match');
-            return redirect('profiles/me')->withErrors($errors);
+            return redirect('profiles/me')->withErrors($errors);  
         }
 
         $user->password = Hash::make($request->password);
         $user->save();
-        session()->flash('status', 'Password succesfully changed!');
+        session()->flash('status', 'Password succesfully changed!'); 
         return back();
     }
 }

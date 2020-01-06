@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\web;
+
 use Request as UrlRequest;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\Post as PostResource;
 use App\Post;
@@ -20,16 +22,13 @@ class PostController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['index', 'show']] );
-        $this->isApi = UrlRequest::segment(1) == 'api';
-    
-        
+        $this->middleware('auth', ['except' => ['index', 'show']]);
     }
 
     public function index()
     {
         $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        return !$this->isApi ? view('post.index')->with('posts', $posts) :  PostResource::collection($posts); 
+        return view('post.index')->with('posts', $posts);
     }
 
     /**
@@ -50,13 +49,19 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate([
+            'content' => "required"
+        ]);
+
+        
         $post = new Post;
         $post->user_id = Auth::user()->id;
         $post->content = $request->content;
         $post->save();
-        $request->session()->flash('status', 'Post successfully sent!');
-        return redirect('/posts');
 
+        session()->flash('status', 'Post successfully sent!');
+        return redirect('/posts');
 
     }
 
@@ -70,7 +75,8 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         $comments = $post->comments()->paginate(10);
-        return !$this->isApi ? view('post.show')->with('post', $post)->with('comments', $comments) : new PostResource($post);
+
+        return view('post.show')->with('post', $post)->with('comments', $comments);
     }
 
     /**
@@ -104,15 +110,12 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-
-        
         $post = Post::findOrFail($id);
         if(isset($post) && $post->user_id == Auth::user()->id)
         {
             $post->delete();
             session()->flash('status', 'Post successfully deleted!');
         }
-
         $previousPath = explode('/', url()->previous());
         return is_numeric(end($previousPath)) ? redirect('/posts')  : back();
     }
@@ -121,6 +124,6 @@ class PostController extends Controller
     {
         $posts = Post::select('posts.*')->join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
         ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
-        return view('post.index')->with('posts', $posts)->with('followingPosts', 1); 
+        return view('post.index')->with('posts', $posts)->with('followingPosts', 1);
     }
 }
