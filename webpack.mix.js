@@ -20,3 +20,5 @@ mix.webpackConfig({
         chunkFilename: 'js/[name].js?id=[chunkhash]',
     }
 });
+
+mix.disableNotifications();

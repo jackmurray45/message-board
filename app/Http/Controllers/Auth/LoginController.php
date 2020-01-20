@@ -28,7 +28,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -42,10 +42,15 @@ class LoginController extends Controller
 
     protected function sendFailedLoginResponse(Request $request)
     {
-        return redirect()->to('/login')
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors([
-                $this->username() => Lang::get('auth.failed'),
-            ]);
+        return inertia('login', [
+            'errors' => ["incorrect email/password"]
+        ]);
     }
+
+    protected function showLoginForm()
+    {
+        return inertia('Login');
+    }
+
+
 }

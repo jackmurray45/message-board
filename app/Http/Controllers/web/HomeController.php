@@ -19,7 +19,7 @@ class HomeController extends Controller
     {
         $posts = Post::orderBy('created_at', 'DESC')->limit(10)->get();
         $users = User::orderBy('created_at', 'DESC')->limit(10)->get();
-        return inertia('Welcome', [
+        return inertia('Dashboard', [
             'posts' => $posts,
             'users' => $users
         ]);

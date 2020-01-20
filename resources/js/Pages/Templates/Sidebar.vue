@@ -6,6 +6,8 @@
         :collapsed="isCollapsed"
         @item-click="onItemClick"
       />
+
+  
 </template>
 
 <script>
@@ -38,6 +40,7 @@ export default {
             this.isCollapsed = true
             this.userUncollapsed = false
             this.menu.map(a=>a.icon === 'fa fa-bars' ? a.hidden = false : a.hidden = true)
+
         },
         
         unCollapsedLayout(){
@@ -71,6 +74,21 @@ export default {
                     href: '/',
                     title: 'Home',
                     icon: 'fa fa-home'
+                },
+                {
+                    title: 'Posts',
+                    icon: 'fa fa-sticky-note',
+                    child: [
+                        {
+                            href: '/posts',
+                            title: 'All'
+                        },
+                        {
+                            href: '/posts?following=1',
+                            title: 'Following'
+                        }
+                    ]
+
                 },
                 {
                     title: 'Profiles',
