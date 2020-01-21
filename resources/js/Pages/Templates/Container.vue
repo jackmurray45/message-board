@@ -72,7 +72,8 @@ export default {
 <style scoped>
 
 .container{
-    margin: 0 auto !important;
+    width:100% !important;
+    max-width:100% !important;
 }
 
 .login-sign-up{

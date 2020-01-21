@@ -98,7 +98,7 @@ class ProfileController extends Controller
         return inertia('Profile', [
             'profile' => $user,
             'posts' => $posts,
-            'followId' => $followId
+            'followId' => $followId == null
         ]);
     }
 
