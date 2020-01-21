@@ -1,7 +1,23 @@
 <template>
     <div>
        <Sidebar/>
+        <div class = "login-sign-up">
+            <div class = "row">
+                <div class = "col text-right" v-if="loggedIn">
+                    <user-card/>
+                </div>
+                <div class = "col text-right" v-else>
+                    <login-sign-up/>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
         <div v-bind:class="isCollapsed ? containerCollapsed : container " >
+            
             <slot></slot>
         </div>
     </div>
@@ -10,6 +26,8 @@
 
 <script>
 import Sidebar from './Sidebar'
+import UserCard from './UserCard'
+import LoginSignUp from './LoginSignUp'
 
 
 
@@ -17,6 +35,8 @@ export default {
     props: ['posts', 'users'],
     components: {
         Sidebar,
+        UserCard,
+        LoginSignUp
     },
     methods: {
         checkCollapse(event){
@@ -28,7 +48,8 @@ export default {
         return {
             container: "container",
             containerCollapsed: "containerCollapsed",
-            isCollapsed: false
+            isCollapsed: false,
+            loggedIn: this.$page.auth.user,
         }
     },
 
@@ -42,15 +63,24 @@ export default {
     beforeDestroy() {
         window.removeEventListener('resize', this.checkCollapse);
     },
+
+     
+    //
 }
 
 </script>
-
-<style>
+<style scoped>
 
 .container{
     margin: 0 auto !important;
-    margin-top: 40px !important;
+}
+
+.login-sign-up{
+}
+
+.link-button{
+    /* padding:15px; */
+
 }
 
 

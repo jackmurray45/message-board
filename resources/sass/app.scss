@@ -7,6 +7,10 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
+body{
+    width: 100% !important;
+    height: 100% !important;
+}
 
 .container{
     padding-left:350px;

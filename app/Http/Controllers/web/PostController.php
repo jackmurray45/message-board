@@ -28,7 +28,12 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        return view('post.index')->with('posts', $posts);
+
+        return inertia('Posts', [
+            'posts' => PostResource::collection($posts),
+        ]);
+
+
     }
 
     /**

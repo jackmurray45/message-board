@@ -6,15 +6,19 @@
         :collapsed="isCollapsed"
         @item-click="onItemClick"
       />
-
-  
 </template>
 
 <script>
 import { SidebarMenu } from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 
+
+const separator = {
+  template: `<hr style="border-color: rgba(220, 220, 220, 1); margin: 20px;">`
+};
+
 export default {
+
     components: {
         SidebarMenu
     },
@@ -76,33 +80,45 @@ export default {
                     icon: 'fa fa-home'
                 },
                 {
+                    header: true,
+                    component: separator,
+                },
+                {
+
                     title: 'Posts',
                     icon: 'fa fa-sticky-note',
-                    child: [
-                        {
-                            href: '/posts',
-                            title: 'All'
-                        },
-                        {
-                            href: '/posts?following=1',
-                            title: 'Following'
-                        }
-                    ]
+                    hiddenOnCollapse: true,
+                    disabled:true,
+                },
 
+                {
+                    href: '/posts',
+                    title: 'All',
+                },
+
+                {
+                    href: '/posts?following=1',
+                    title: 'Following',
+                },
+                {
+                    header: true,
+                    component:separator,
                 },
                 {
                     title: 'Profiles',
                     icon: 'fa fa-user',
-                    child: [
-                        {
-                            href: '/profiles',
-                            title: 'All'
-                        },
-                        {
-                            href: '/profiles/following',
-                            title: 'Following'
-                        }
-                    ]
+                    hiddenOnCollapse: true,
+                    disabled: true,
+                },
+
+                {
+                    href: '/profiles',
+                    title: 'All',
+                },
+
+                {
+                    href: '/profiles?following=1',
+                    title: 'Following',
                 },
                 
             ],
@@ -130,5 +146,12 @@ export default {
 
 }
 </script>
+
+<style>
+.v-sidebar-menu .vsm--link.vsm--link_disabled {
+    opacity: 1.0 !important;
+}
+
+</style>
 
 

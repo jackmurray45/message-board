@@ -11356,6 +11356,11 @@ a.text-dark:focus {
   }
 }
 
+body {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .container {
   padding-left: 350px;
   margin: 0 !important;

@@ -93,7 +93,13 @@ class ProfileController extends Controller
                 $followId = $follow->id;
             }
         }
-        return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
+        //return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
+
+        return inertia('Profile', [
+            'profile' => $user,
+            'posts' => $posts,
+            'followId' => $followId
+        ]);
     }
 
 

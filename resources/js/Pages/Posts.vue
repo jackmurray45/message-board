@@ -2,6 +2,10 @@
     <div>
        <Container>
            
+           <div v-for="post in posts.data"> 
+               <post :postData="post"/>
+
+           </div>
        </Container>
     </div>
     
@@ -9,18 +13,25 @@
 
 <script>
 import Container from './Templates/Container'
+import Post from './Templates/Post'
 
 
 export default {
-    props: [],
+    props: {
+        posts: Object,
+    },
     components: {
         Container,
+        Post,
 
     },
 
     methods: {
+        
 
     },
+
+    
 
 }
 
