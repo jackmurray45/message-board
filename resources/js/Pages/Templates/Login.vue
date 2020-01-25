@@ -34,36 +34,21 @@
 
 <script>
 import VueLoadingButton from 'vue-loading-button';
-import Axios from 'axios'
 
 
 export default {
     components: {
         VueLoadingButton,
-        Axios,
     },
     methods: {
         loginAttempt(){
             this.sending = true
-            // Axios.post('/login',{
-            //     email: this.form.email,
-            //     password: this.form.password,
-            // })
-            // .then(response => {console.log(response)})
-            // .catch(e => {
-            //     this.errors.push(e)
-            // })
 
             this.$inertia.post('/login', {
                 email: this.form.email,
                 password: this.form.password,
                 remember: this.form.remember,
-            }).then(() => this.sending = false)
-            
-
-            
-            
-            
+            }).then(() => this.sending = false) 
         }
     
     },

@@ -1,47 +1,81 @@
 <template>
-    <div class="row">
-        <div class="col-lg-12 form-group">
-            <h2>Sign Up</h2>
+    <form @submit.prevent="submit">
+        <div class="row">
+            <div class="col-lg-12 form-group">
+                <h2>Sign Up</h2>
+            </div>
+            <div class="col-lg-12 form-group">
+                <i class="fa fa-user icon-left"></i>
+                <input v-model="form.name" type="text" class = "login-input col-lg-12" value="" name="name" placeholder="Name" aria-required="true" />
+                <span class="buttom-border"></span>
+            </div>
+            <div class="col-lg-12 form-group">
+                <i class="fa fa-user icon-left"></i>
+                <input v-model="form.email" type="email" class = "login-input col-lg-12" value="" name="email" placeholder="Email" aria-required="true" />
+                <span class="buttom-border"></span>
+            </div>
+            <div class="col-lg-12 form-group">
+                <i class="fa fa-lock icon-left"></i>
+                <input v-model="form.password" type="password" class = "login-input col-lg-12" value="" name="password" placeholder="Password" aria-required="true" />
+                <span class="buttom-border"></span>
+            </div>
+            <div class="col-lg-12 form-group">
+                <i class="fa fa-lock icon-left"></i>
+                <input v-model="form.password_confirmation" type="password" class = "login-input col-lg-12" value="" name="password-confirm" placeholder="Confirm Password" aria-required="true" />
+                <span class="buttom-border"></span>
+            </div>
+            <div class="col-lg-12 form-group group-buttons">
+                <!-- <button type="button" class="btn btn-success btn-block">Create Account</button> -->
+
+                <VueLoadingButton
+                    class="btn btn-success btn-block bootstrap-btn-fix"
+                    @click.native="signUpAttempt"
+                    :loading="sending"
+                    :styled="styled"
+                    >Create Account
+                </VueLoadingButton>
+                
+                <inertia-link href="/login" >
+                    <button type="button" class="btn btn-primary btn-block" style="margin-top:8px;">Already a user? Login</button>
+                </inertia-link>
+            </div>
         </div>
-        <div class="col-lg-12 form-group">
-            <i class="fa fa-user icon-left"></i>
-            <input type="text" class = "login-input col-lg-12" value="" name="user" placeholder="Username" aria-required="true" />
-            <span class="buttom-border"></span>
-        </div>
-        <div class="col-lg-12 form-group">
-            <i class="fa fa-lock icon-left"></i>
-            <input type="password" class = "login-input col-lg-12" value="" name="password" placeholder="Password" aria-required="true" />
-            <span class="buttom-border"></span>
-        </div>
-        <div class="col-lg-12 form-group">
-            <i class="fa fa-lock icon-left"></i>
-            <input type="password" class = "login-input col-lg-12" value="" name="confirm_password" placeholder="Confirm Password" aria-required="true" />
-            <span class="buttom-border"></span>
-        </div>
-        <div class="col-lg-12 form-group group-buttons">
-            <button type="button" class="btn btn-success btn-block">Create Account</button>
-            
-            <inertia-link href="/login" >
-                <button type="button" class="btn btn-primary btn-block" style="margin-top:8px;">Already a user? Login</button>
-            </inertia-link>
-        </div>
-    </div>
+    </form>
 </template>
 
 <script>
-
+import VueLoadingButton from 'vue-loading-button';
 
 export default {
     components: {
-        
+        VueLoadingButton,
     },
     methods: {
+        signUpAttempt(){
+            this.sending = true
+
+            console.log(this.form)
+
+            this.$inertia.post('/register', {
+                email: this.form.email,
+                name: this.form.name,
+                password: this.form.password,
+                password_confirmation: this.form.password_confirmation,
+                remember: this.form.remember,
+            }).then(() => this.sending = false) 
+        }
         
-
-
     },
     data() {
         return {
+            sending: false,
+            styled: false,
+            form: {
+                email: '',
+                password: '',
+                password_confirmation: '',
+                remember: null,
+            }
 
         }
             
@@ -67,7 +101,7 @@ export default {
         width: 0;
     }
  
-    input[type=text], input[type=password]{
+    input[type=text], input[type=password], input[type=email]{
         outline: 0;
         border-width: 0 0 2px;
         border-color: black !important;
