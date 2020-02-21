@@ -1,5 +1,5 @@
 <template>
-    <div :class = "profileClass">
+    <div>
         <b-card
             :img-src="backgroundPhoto"
             img-alt="Image"
@@ -28,7 +28,6 @@ export default {
     props: {
         profileData: Object,
         isFollowing: Boolean,
-        profileClass: String,
     },
     components: {
         BCard,
@@ -44,8 +43,8 @@ export default {
     },
     data() {
         return {
-            profilePhoto: this.$page.auth.user.profile_pic ? this.$page.auth.user.profile_pic : "/images/no-profile-pic.jpg",
-            backgroundPhoto: this.$page.auth.user.background_pic ? this.$page.auth.user.background_pic : "/images/gray-background.jpg",
+            profilePhoto: this.$props.profileData.profile_pic ? this.$props.profileData.profile_pic : "/images/no-profile-pic.jpg",
+            backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
 
         }
             

@@ -1,7 +1,7 @@
 <template>
     <div>
        <Container>
-           <profile :profileData="profile" :isFollowing="following" profileClass="profile-page"/>
+           <profile :profileData="profile" :isFollowing="following" class="profile-page"/>
        </Container>
     </div>
     

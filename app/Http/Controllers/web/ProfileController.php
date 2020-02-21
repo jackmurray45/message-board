@@ -40,8 +40,10 @@ class ProfileController extends Controller
             }
         }
         
-        
-        return view('profile.index')->with('users', $users)->with('followMap', $followMap);
+        return inertia('Profiles', [
+            'profiles' => $users,
+        ]);
+
     }
 
     
