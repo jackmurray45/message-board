@@ -146,6 +146,7 @@ class ProfileController extends Controller
             ['following_user_id', '=', Auth::user()->id],
             ['followed_user_id', '=', $id]
         ])->first();
+        
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
