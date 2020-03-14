@@ -43,7 +43,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function getIsFollowingAttribute()
     {
-        return !Auth::guest() && in_array(Auth::user()->id, $this->followers()->pluck('following_user_id')->toArray());
+
+        return !Auth::guest()  ? 
+            in_array(Auth::user()->id, $this->followers()->pluck('following_user_id')->toArray()) : 
+            -1;
     }
 
     public function posts()

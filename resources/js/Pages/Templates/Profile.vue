@@ -45,10 +45,18 @@ export default {
 
     methods: {
         followerUser(){
+            if(this.profileData.is_following == -1){
+                window.location.href = 'login'
+                return false
+            }
             this.isFollowing = true; 
             axios.post(`/profiles?user=${this.profileData.id}`, {}).then(() => null)
         },
         unFollowerUser(){
+            if(this.profileData.is_following == -1){
+                window.location.href = 'login'
+                return false
+            }
             this.isFollowing = false; 
             axios.delete(`/profiles/${this.profileData.id}`, {}).then((response) => null)
         }
@@ -58,7 +66,7 @@ export default {
             profilePhoto: this.$props.profileData.profile_pic ? this.$props.profileData.profile_pic : "/images/no-profile-pic.jpg",
             backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
             headerLink: `/profiles/${this.$props.profileData.id}`,
-            isFollowing: this.profileData.is_following,
+            isFollowing: this.profileData.is_following != -1 && this.profileData.is_following,
 
         }
             
