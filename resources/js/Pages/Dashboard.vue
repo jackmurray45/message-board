@@ -1,7 +1,7 @@
 <template>
     <div>
        <Container>
-            <write-post />
+            <write-post class = 'dashboard-write-post' />
        </Container>
     </div>
     
@@ -29,6 +29,10 @@ export default {
 </script>
 
 <style>
+.dashboard-write-post{
+    padding-top:100px;
+    padding-bottom:100px;
+}
 
 
 
