@@ -20,6 +20,7 @@ class ProfileController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']] );
+        $this->middleware('check.following', ['index']);
     }
 
     /**
@@ -27,19 +28,20 @@ class ProfileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $followMap = [];
-        $users = User::orderBy('created_at', 'DESC')->paginate(20);
-        if(!Auth::guest())
+
+        if($request->following == 1)
         {
-            $followCollection = Auth::user()->following;
-            foreach($followCollection as $follow)
-            {
-                $followMap[$follow->followed_user_id] = $follow->id;
-            }
+            $users = User::select('users.*')->join('follows', 'users.id', '=', 'follows.followed_user_id')
+            ->where('following_user_id', '=', Auth::user()->id)->orderBy('follows.created_at', 'DESC')->paginate(20);
+            $users->put('is_following', true)->pop();
         }
-        
+        else
+        {
+            $users = User::orderBy('created_at', 'DESC')->paginate(20);
+        }
+                
         return inertia('Profiles', [
             'profiles' => $users,
         ]);
@@ -57,7 +59,7 @@ class ProfileController extends Controller
     public function store(Request $request)
     {
 
-        $message = 'User successfully followed!';
+        $success = 1;
 
         if(Auth::user()->id != $request->user && User::find($request->user))
         {
@@ -68,11 +70,10 @@ class ProfileController extends Controller
         }
         else
         {
-            $message = "Error following user";
+            $success = 0;
         }
 
-        session()->flash('status', $message);
-        return back();
+        return response()->json(['success' => $success]);
         
     }
 
@@ -85,6 +86,7 @@ class ProfileController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
+
         $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'DESC')->paginate(10);
         $followId = null;
         if(!Auth::guest())
@@ -96,7 +98,6 @@ class ProfileController extends Controller
             }
         }
         //return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
-
         return inertia('Profile', [
             'profile' => $user,
             'posts' => $posts,
@@ -141,13 +142,16 @@ class ProfileController extends Controller
      */
     public function destroy($id)
     {
-        $follow = Follow::findOrFail($id);
+        $follow = Follow::where([
+            ['following_user_id', '=', Auth::user()->id],
+            ['followed_user_id', '=', $id]
+        ])->first();
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
             session()->flash('status', 'User successfully Unfollowed!'); 
         }
-        return back();
+        return response()->json(['success' => 1]);
     }
 
     public function myProfile()

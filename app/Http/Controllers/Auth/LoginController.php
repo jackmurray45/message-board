@@ -42,8 +42,8 @@ class LoginController extends Controller
 
     protected function sendFailedLoginResponse(Request $request)
     {
-        return inertia('login', [
-            'errors' => ["incorrect email/password"]
+        return inertia('Login', [
+            'errors' => ["Incorrect Email/Password"]
         ]);
     }
 
