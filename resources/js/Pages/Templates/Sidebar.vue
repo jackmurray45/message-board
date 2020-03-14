@@ -133,7 +133,7 @@ export default {
         }
     },
 
-    mounted() {
+    beforeCreate() {
         this.$nextTick(function() {
             window.addEventListener('resize', this.checkCollapse);
             //Init

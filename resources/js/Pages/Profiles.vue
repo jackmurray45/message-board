@@ -1,14 +1,8 @@
 <template>
     <div>
        <Container>
-           
-           <div v-for="profile in profiles.data" > 
-               <Profile class = "profiles" :profileData="profile" :key="profiles.data.id" />
-           </div>
-
+           <profile-list :profiles = "profiles.data" />
            <pagination :metaData="metaData" :pagesDisplayed="pagesDisplayed"/>
-
-        
        </Container>
     </div>
     
@@ -16,7 +10,7 @@
 
 <script>
 import Container from './Templates/Container'
-import Profile from './Templates/Profile'
+import ProfileList from './Templates/ProfileList'
 import Pagination from './Templates/Pagination'
 
 
@@ -26,7 +20,7 @@ export default {
     },
     components: {
         Container,
-        Profile,
+        ProfileList,
         Pagination,
 
     },
@@ -55,7 +49,7 @@ export default {
 
 </script>
 
-<style scoped>
+<style>
 .profiles{
     width:75% !important;
     margin: 0 auto !important;

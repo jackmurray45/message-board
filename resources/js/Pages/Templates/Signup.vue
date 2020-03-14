@@ -8,21 +8,25 @@
                 <i class="fa fa-user icon-left"></i>
                 <input v-model="form.name" type="text" class = "login-input col-lg-12" value="" name="name" placeholder="Name" aria-required="true" />
                 <span class="buttom-border"></span>
+                <span class = 'error-message' v-if="errorsData != null && errorsData.name != null && errorsData.name.length > 0">{{errorsData.name[0]}}</span>
             </div>
             <div class="col-lg-12 form-group">
                 <i class="fa fa-user icon-left"></i>
                 <input v-model="form.email" type="email" class = "login-input col-lg-12" value="" name="email" placeholder="Email" aria-required="true" />
                 <span class="buttom-border"></span>
+                <span class = 'error-message' v-if="errorsData != null && errorsData.email != null && errorsData.email.length > 0">{{errorsData.email[0]}}</span>
             </div>
             <div class="col-lg-12 form-group">
                 <i class="fa fa-lock icon-left"></i>
                 <input v-model="form.password" type="password" class = "login-input col-lg-12" value="" name="password" placeholder="Password" aria-required="true" />
                 <span class="buttom-border"></span>
+                <span class = 'error-message' v-if="errorsData != null && errorsData.password != null &&  errorsData.password.length > 0">{{errorsData.password[0]}}</span>
             </div>
             <div class="col-lg-12 form-group">
                 <i class="fa fa-lock icon-left"></i>
                 <input v-model="form.password_confirmation" type="password" class = "login-input col-lg-12" value="" name="password-confirm" placeholder="Confirm Password" aria-required="true" />
                 <span class="buttom-border"></span>
+                <span class = 'error-message' v-if="errorsData != null && errorsData.password_confirmation != null && errorsData.password_confirmation.length > 0">{{errorsData.password_confirmation[0]}}</span>
             </div>
             <div class="col-lg-12 form-group group-buttons">
                 <!-- <button type="button" class="btn btn-success btn-block">Create Account</button> -->
@@ -47,15 +51,77 @@
 import VueLoadingButton from 'vue-loading-button';
 
 export default {
+    props: {
+        errors : {
+            Type: Object,
+            default: {
+                email: [],
+                password: [],
+                name: [],
+                password_confirmation: [],
+            }
+
+        }
+    },
     components: {
         VueLoadingButton,
     },
     methods: {
+        validateSignIn(){
+            this.readyForSubmit = false;
+            this.errorsData = {
+                email: [],
+                password: [],
+                name: [],
+                password_confirmation: []
+            }
+
+            if(  !(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email))  ){
+                this.errorsData.email = ['Invalid email.']
+            }
+
+            if(this.form.email.length == 0){
+                this.errorsData.email = ['The email field is required.']
+            }
+
+            if(this.form.name.length == 0){
+                this.errorsData.name = ['The name field is required.']
+            }
+
+            if(this.form.password != this.form.password_confirmation){
+                this.errorsData.password = ['The password field does not match the confirm password field.']
+            }
+
+            if(this.form.password.length < 8){
+                this.errorsData.password = ['The password field is too short']
+            }
+
+            if(this.form.password_confirmation.length < 8 && this.errorsData.password.length == 0){
+                this.errorsData.password_confirmation = ['The confirm password field is too short']
+            }
+
+            
+
+
+            if(this.errorsData.name.length > 0 || 
+            this.errorsData.email.length > 0 || 
+            this.errorsData.password.length > 0 || 
+            this.errorsData.password_confirmation.length > 0){
+                this.readyForSubmit = false;
+            }
+            else{
+                this.readyForSubmit = true;
+            }
+        },
+
         signUpAttempt(){
+
+            this.validateSignIn()
+            if(!this.readyForSubmit){
+                return false;
+            }
+
             this.sending = true
-
-            console.log(this.form)
-
             this.$inertia.post('/register', {
                 email: this.form.email,
                 name: this.form.name,
@@ -68,14 +134,17 @@ export default {
     },
     data() {
         return {
+            readyForSubmit: false,
             sending: false,
             styled: false,
             form: {
+                name: '',
                 email: '',
                 password: '',
                 password_confirmation: '',
                 remember: null,
-            }
+            },
+            errorsData: this.errors
 
         }
             
@@ -89,6 +158,10 @@ export default {
 <style scoped>
     .row{
         margin: 0 auto;
+    }
+
+    .form-group{
+        height:65px;
     }
 
     .icon-left{
@@ -143,6 +216,9 @@ export default {
 
     .group-buttons{
         margin-top:15px;
+    }
+    .error-message{
+        color:red;
     }
     
 </style>

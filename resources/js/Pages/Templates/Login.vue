@@ -1,19 +1,25 @@
 <template>
     <form @submit.prevent="submit">
         <div class="row">
-            
+
+                
                 <div class="col-lg-12 form-group">
                     <h2>Login</h2>
+                </div>
+                <div  v-if="errors.length > 0" class = 'error-message'>
+                    {{errors[0]}}
                 </div>
                 <div class="col-lg-12 form-group">
                     <i class="fa fa-user icon-left"></i>
                     <input v-model="form.email" class = "login-input col-lg-12"  placeholder="Email" type="email" autocapitalize="off" />
                     <span class="buttom-border"></span>
+                    <span class = 'error-message' v-if="errorsData != null && errorsData.email != null && errorsData.email.length > 0">{{errorsData.email[0]}}</span>
                 </div>
                 <div class="col-lg-12 form-group">
                     <i class="fa fa-lock icon-left"></i>
                     <input v-model="form.password" type="password" class = "login-input col-lg-12" name="password" placeholder="Password" aria-required="true" />
                     <span class="buttom-border"></span>
+                    <span class = 'error-message' v-if="errorsData != null && errorsData.password != null &&  errorsData.password.length > 0">{{errorsData.password[0]}}</span>
                 </div>
                 <div class="col-lg-12 form-group group-buttons">
                     <VueLoadingButton
@@ -37,13 +43,56 @@ import VueLoadingButton from 'vue-loading-button';
 
 
 export default {
+    props: {
+        errors : {
+            Type: Object,
+            default: {
+                email: [],
+                password: [],
+                name: [],
+                password_confirmation: [],
+            }
+
+        }
+    },
     components: {
         VueLoadingButton,
     },
     methods: {
-        loginAttempt(){
-            this.sending = true
+        validateLogIn(){
+            this.readyForSubmit = false;
+            this.errorsData = {
+                email: [],
+                password: [],
+            }
 
+            if(  !(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email))  ){
+                this.errorsData.email = ['Invalid email.']
+            }
+
+            if(this.form.email.length == 0){
+                this.errorsData.email = ['The email field is required.']
+            }
+
+            if(this.form.password.length < 8){
+                this.errorsData.password = ['The password field is too short']
+            }
+
+            if( 
+            this.errorsData.email.length > 0 || 
+            this.errorsData.password.length > 0){
+                this.readyForSubmit = false;
+            }
+            else{
+                this.readyForSubmit = true;
+            }
+        },
+        loginAttempt(){
+            this.validateLogIn()
+            if(!this.readyForSubmit){
+                return false;
+            }            
+            this.sending = true
             this.$inertia.post('/login', {
                 email: this.form.email,
                 password: this.form.password,
@@ -54,13 +103,15 @@ export default {
     },
     data() {
         return {
+            readyForSubmit: false,
             sending: false,
             styled: false,
             form: {
                 email: '',
                 password: '',
                 remember: null
-            }
+            },
+            errorsData: this.errors,
 
         }
             
@@ -124,11 +175,17 @@ export default {
 
     .form-group{
         margin-bottom:0px;
+        height:65px;
     }
 
     .group-buttons{
         margin-top:15px;
     }
+
+    .error-message{
+        color:red;
+    }
+    
 </style>
 
 

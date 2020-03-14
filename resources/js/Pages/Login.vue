@@ -1,7 +1,7 @@
 <template>
     <div>
        <Container>
-           <Login/>
+            <Login :errors = "errors"/>
        </Container>
     </div>
     
@@ -13,7 +13,18 @@ import Login from './Templates/Login'
 
 
 export default {
-    props: ['posts', 'users'],
+    props: {
+        errors : {
+            Type: Object,
+            default: {
+                email: [],
+                password: [],
+                name: [],
+                password_confirmation: [],
+            }
+
+        }
+    },
     components: {
         Container,
         Login,

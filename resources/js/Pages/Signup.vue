@@ -1,7 +1,7 @@
 <template>
     <div>
        <Container>
-           <Signup/>
+           <Signup :errors="errors"/>
        </Container>
     </div>
     
@@ -13,11 +13,22 @@ import Signup from './Templates/Signup'
 
 
 export default {
-    props: [],
+    props: {
+        errors : {
+            Type: Object,
+            default: {
+                email: [],
+                password: [],
+                name: [],
+                password_confirmation: [],
+            }
+
+        }
+    },
     components: {
         Container,
         Signup,
-    }
+    },
 }
 </script>
 

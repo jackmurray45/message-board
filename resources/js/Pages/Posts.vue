@@ -1,22 +1,16 @@
 <template>
     <div>
-       <Container>
-           
-           <div v-for="post in posts.data"> 
-               <post :postData="post"/>
-           </div>
-
-           <pagination/>
-
-        
-       </Container>
+       <container>
+            <post-list :posts = "posts.data" />
+            <pagination :metaData="metaData" :pagesDisplayed="pagesDisplayed"/>
+       </container>
     </div>
     
 </template>
 
 <script>
 import Container from './Templates/Container'
-import Post from './Templates/Post'
+import PostList from './Templates/PostList'
 import Pagination from './Templates/Pagination'
 
 
@@ -26,14 +20,26 @@ export default {
     },
     components: {
         Container,
-        Post,
+        PostList,
         Pagination,
 
     },
+    
+    data() {
+        return {
+            metaData: null,
+            pagesDisplayed: 5,
 
-    methods: {
-
+        }
+            
     },
+
+    //Pass meta data w/o profiles to the pagination component
+    created(){
+        this.metaData = JSON.parse(JSON.stringify(this.$props.posts))
+        delete this.metaData['data']
+    }
+
 
     
 

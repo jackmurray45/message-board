@@ -7,9 +7,9 @@
                 </inertia-link>
             </b-dropdown-item>
             <b-dropdown-item class = "user-card-item">
-                <inertia-link href="logout">
+                <a href="logout" @click="submitLogout">
                     Logout
-                </inertia-link>
+                </a>
             </b-dropdown-item>
         </b-dropdown>
     </div>
@@ -28,6 +28,12 @@ export default {
     },
 
     methods: {
+        submitLogout(e){
+            e.preventDefault
+            console.log(1)
+            this.$inertia.post('/logout', {
+            }).then(() => null) 
+        }
 
     },
 

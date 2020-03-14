@@ -3,23 +3,33 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
                 <li class = "page-item" v-bind:class = "{disabled : disableBackPages}">
-                    <a class="page-link" :href="`${urlString}1`" tabindex="-1">«</a>
+                    <inertia-link :href="`${urlString}1`" class="page-link" :preserve-scroll="isPreserveScroll"> 
+                        «
+                    </inertia-link>
                 </li>
                 <li class="page-item" v-bind:class = "{disabled : disableBackPages}">
-                    <a class="page-link" :href="`${urlString}${metaData.current_page-1}`" tabindex="-1">Previous</a>
+                    <inertia-link :href="`${urlString}${metaData.current_page-1}`" class="page-link" :preserve-scroll="isPreserveScroll">
+                        Previous
+                    </inertia-link>
                 </li>
 
                 <template  v-for="n in (end-start)+1">
                     <li class = "page-item" v-bind:class = "{disabled : n+start-1 == metaData.current_page}" :key="n">
-                        <a class="page-link" :href="`${urlString}${n+start-1}`">{{n+start-1}}</a>
+                        <inertia-link :href="`${urlString}${n+start-1}`" class="page-link" :preserve-scroll="isPreserveScroll">
+                            {{n+start-1}}
+                        </inertia-link>
                     </li>
                 </template>
 
                 <li class="page-item" v-bind:class = "{disabled : disableForwardPages}">
-                    <a class="page-link" :href="`${urlString}${metaData.current_page+1}`">Next</a>
+                    <inertia-link :href="`${urlString}${metaData.current_page+1}`" class="page-link" :preserve-scroll="isPreserveScroll">
+                        Next
+                    </inertia-link>
                 </li>
                 <li class="page-item" v-bind:class = "{disabled : disableForwardPages}">
-                    <a class="page-link" :href="`${urlString}${this.$props.metaData.last_page}`">»</a>
+                    <inertia-link :href="`${urlString}${this.$props.metaData.last_page}`" class="page-link" :preserve-scroll="isPreserveScroll">
+                        »
+                    </inertia-link>
                 </li>
                 
             </ul>
@@ -40,7 +50,11 @@ export default {
         },
         urlPath:{
             type: String,
-            default: window.location.pathname
+            default: ''
+        },
+        preserveScroll:{
+            type: Boolean,
+            default: false
         }
     },
 
@@ -50,16 +64,25 @@ export default {
     methods: {
 
         createUrl(){
-            if( typeof(this.$props.urlParams)  == "Object"){
-                this.$props.urlParams = Object.keys(this.$props.url).map(key => key + '=' + this.$props.urlParams[key]).join('&')
+
+            let urlParams = this.$props.urlParams
+            let urlPath = this.$props.urlPath
+
+            if( typeof(urlParams)  == "Object"){
+                urlParams = Object.keys(urlParams).map(key => key + '=' + urlParams[key]).join('&')
+            }
+
+            if(urlPath == ''){
+                urlPath = window.location.pathname
             }
 
 
-            this.urlString = this.$props.urlParams.replace(/\&?\??A?page=[^&]+&*/, '')
-            this.urlString = `${this.$props.urlPath}?${this.urlString}page=`
+            this.urlString = urlParams.replace(/\&?\??A?page=[^&]+&*/, '')
+            this.urlString = `${urlPath}?${this.urlString}page=`
         },
 
         createNums(){
+            
             let bottomHalfCount = Math.floor((this.$props.pagesDisplayed - 1)/2)
             let upperHalfCount = Math.ceil((this.$props.pagesDisplayed - 1)/2)
 
@@ -91,7 +114,6 @@ export default {
                 end = lastPage
             }
 
-            
             this.start = start
             this.end = end
 
@@ -106,6 +128,7 @@ export default {
             urlString: null,
             start: 0,
             end: 0,
+            isPreserveScroll: this.$props.preserveScroll,
         }
 
             

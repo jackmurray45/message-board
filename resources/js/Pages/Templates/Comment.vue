@@ -3,15 +3,12 @@
        <!-- {{ postData.content }} -->
        <b-card>
             <inertia-link :href = "headerLink">
-                <b-card-title :title="postData.user.name" style = 'width:auto'/>
+                <b-card-title :title="commentData.user.name"/>
             </inertia-link>
+            <!-- <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-user"></i> Following</button> -->
             <b-card-text>
-                {{postData.content}}
+                {{commentData.content}}
             </b-card-text>
-
-            <inertia-link :href = "postLink" v-if="!onPost">
-                View Post
-            </inertia-link>
         </b-card>
     </div>
     
@@ -20,15 +17,12 @@
 <script>
 import { BCard, BCardText, BLink, BCardTitle } from 'bootstrap-vue'
 
+
 export default {
 
 
     props: {
-        postData: Object,
-        onPost: {
-            type: Boolean,
-            default: false,
-        }
+        commentData: Object
     },
     components: {
         BCard,
@@ -36,11 +30,14 @@ export default {
         BLink,
         BCardTitle,
     },
+
+    methods: {
+
+    },
+
     data(){
         return{
-            headerLink: `/profiles/${this.postData.user.id}`,
-            postLink: `/posts/${this.postData.id}`,
-            isProfilePage: this.profilePage
+            headerLink: `/profiles/${this.commentData.user.id}`,
         }
     },
 
@@ -57,9 +54,5 @@ button{
     right:0;
     top:0;
     margin: 25px;
-}
-
-.hide-view-post{
-    display:none;
 }
 </style>

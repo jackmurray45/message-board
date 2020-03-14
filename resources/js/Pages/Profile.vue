@@ -2,6 +2,9 @@
     <div>
        <Container>
            <profile :profileData="profile" :isFollowing="following" class="profile-page"/>
+
+            <post-list :posts = "posts.data" />
+            <pagination :metaData="metaData" :pagesDisplayed="pagesDisplayed" :preserveScroll="true"/>
        </Container>
     </div>
     
@@ -9,6 +12,8 @@
 
 <script>
 import Container from './Templates/Container'
+import PostList from './Templates/PostList'
+import Pagination from './Templates/Pagination'
 import Profile from './Templates/Profile'
 
 
@@ -20,13 +25,25 @@ export default {
     },
     components: {
         Container,
-        Profile
-
+        Profile,
+        PostList,
+        Pagination,
     },
 
-    methods: {
+    data() {
+        return {
+            metaData: null,
+            pagesDisplayed: 3,
 
+        }
+            
     },
+
+    //Pass meta data w/o profiles to the pagination component
+    created(){
+        this.metaData = JSON.parse(JSON.stringify(this.$props.posts))
+        delete this.metaData['data']
+    }
 
 }
 

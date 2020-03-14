@@ -1,7 +1,7 @@
 <template>
     <div>
        <Container>
-           
+            <write-post />
        </Container>
     </div>
     
@@ -9,12 +9,14 @@
 
 <script>
 import Container from './Templates/Container'
+import WritePost from './Templates/WritePost'
 
 
 export default {
     props: [],
     components: {
         Container,
+        WritePost,
 
     },
 

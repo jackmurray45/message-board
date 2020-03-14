@@ -10,7 +10,13 @@
             class="mb-2 text-center profile-card"
         >
             <b-card-img :src="profilePhoto" alt="Image" bottom class ="user-photo rounded-circle"></b-card-img>
-            <b-card-title :title="profileData.name" style = "margin-top:10px;"/>
+            <inertia-link :href="headerLink" >
+                <b-card-title :title="profileData.name" style = "margin-top:10px;"/>
+            </inertia-link>
+
+            <button  type="button" v-if = "!isFollowing" class="btn btn-outline-primary btn-sm follow-btn"  @click="followerUser"  ><i class="fa fa-user"></i> Follow</button>
+            <button  type="button" v-else class="btn btn-primary btn-sm follow-btn" @click="unFollowerUser" ><i class="fa fa-user"></i> Unfollow</button>
+            
             <!-- <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-user"></i> Following</button> -->
             <b-card-text class = "text-center">
                 {{profileData.bio}}
@@ -22,12 +28,12 @@
 
 <script>
 import { BCard, BCardText, BLink, BCardTitle, BCardImg } from 'bootstrap-vue'
+import axios from 'axios'
 
 
 export default {
     props: {
         profileData: Object,
-        isFollowing: Boolean,
     },
     components: {
         BCard,
@@ -35,16 +41,24 @@ export default {
         BLink,
         BCardTitle,
         BCardImg,
-    
     },
 
     methods: {
-
+        followerUser(){
+            this.isFollowing = true; 
+            axios.post(`/profiles?user=${this.profileData.id}`, {}).then(() => null)
+        },
+        unFollowerUser(){
+            this.isFollowing = false; 
+            axios.delete(`/profiles/${this.profileData.id}`, {}).then((response) => null)
+        }
     },
     data() {
         return {
             profilePhoto: this.$props.profileData.profile_pic ? this.$props.profileData.profile_pic : "/images/no-profile-pic.jpg",
             backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
+            headerLink: `/profiles/${this.$props.profileData.id}`,
+            isFollowing: this.profileData.is_following,
 
         }
             
@@ -64,9 +78,9 @@ export default {
     height: 100px;
 }
 
-
-
-
-
+.follow-btn{
+    margin-top:10px;
+    margin-bottom:15px;
+}
 
 </style>
