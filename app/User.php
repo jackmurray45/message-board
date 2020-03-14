@@ -6,10 +6,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Auth;
 
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+
+    protected $appends = ['is_following'];
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +40,11 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getIsFollowingAttribute()
+    {
+        return !Auth::guest() && in_array(Auth::user()->id, $this->followers()->pluck('following_user_id')->toArray());
+    }
 
     public function posts()
     {
