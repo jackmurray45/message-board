@@ -2,7 +2,7 @@
     <div>
         <b-dropdown :text=$page.auth.user.name>
             <b-dropdown-item class = "user-card-item">
-                <inertia-link href="profile/me">
+                <inertia-link href="/profiles/me">
                     My Profile
                 </inertia-link>
             </b-dropdown-item>

@@ -11,7 +11,7 @@ Use App\Post;
 use App\Http\Resources\Profile as ProfileResource;
 use Auth;
 use Hash;
-use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -118,7 +118,8 @@ class ProfileController extends Controller
     {        
         $request->validate([
             'email' => "unique:users,email,$id,id",
-            'name' => 'required|max:255'
+            'name' => 'required|max:255',
+            "bio" => 'nullable'
         ]);
 
         $user = User::findOrFail($id);
@@ -128,10 +129,10 @@ class ProfileController extends Controller
             $user->email = $request->email;
             $user->bio = $request->bio;
             $user->save();
-            session()->flash('status', 'Your Account has been successfully updated!');  
+            //session()->flash('status', 'Your Account has been successfully updated!');  
         }
 
-        return back();
+        return $this->show($user->id);
     }
 
     /**
@@ -158,7 +159,12 @@ class ProfileController extends Controller
     public function myProfile()
     {
         $user = Auth::user();
-        return view('profile.me')->with('user', $user)->with('posts', $user->posts);
+        //return view('profile.me')->with('user', $user)->with('posts', $user->posts);
+        //dd($user);
+        return inertia('Me', [
+            'user' => $user
+        ]);
+        
     }
 
     public function followingProfiles()
@@ -177,22 +183,22 @@ class ProfileController extends Controller
     public function updateAuthUserPassword(Request $request)
     {
         $this->validate($request, [
-            'current' => 'required',
+            'old_password' => 'required',
             'password' => 'required|confirmed',
             'password_confirmation' => 'required'
         ]);
 
         $user = Auth::user();
-
-        if (!Hash::check($request->current, $user->password)) {
-            $errors = new MessageBag;
-            $errors->add('password', 'Current password does not match');
-            return redirect('profiles/me')->withErrors($errors);  
+        if (!Hash::check($request->old_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'old_password' => ['the old password is incorrect.']
+            ]);
+            
         }
 
         $user->password = Hash::make($request->password);
         $user->save();
-        session()->flash('status', 'Password succesfully changed!'); 
-        return back();
+        //session()->flash('status', 'Password succesfully changed!'); 
+        return $this->show($user->id);
     }
 }
