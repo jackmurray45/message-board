@@ -4427,6 +4427,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -4469,7 +4471,8 @@ __webpack_require__.r(__webpack_exports__);
       profilePhoto: this.$props.profileData.profile_pic ? this.$props.profileData.profile_pic : "/images/no-profile-pic.jpg",
       backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
       headerLink: "/profiles/".concat(this.$props.profileData.id),
-      isFollowing: this.profileData.is_following != -1 && this.profileData.is_following
+      isFollowing: this.profileData.is_following != -1 && this.profileData.is_following,
+      isSelf: this.profileData.is_self
     };
   }
 });
@@ -45488,25 +45491,36 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          !_vm.isFollowing
-            ? _c(
-                "button",
-                {
-                  staticClass: "btn btn-outline-primary btn-sm follow-btn",
-                  attrs: { type: "button" },
-                  on: { click: _vm.followerUser }
-                },
-                [_c("i", { staticClass: "fa fa-user" }), _vm._v(" Follow")]
-              )
-            : _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary btn-sm follow-btn",
-                  attrs: { type: "button" },
-                  on: { click: _vm.unFollowerUser }
-                },
-                [_c("i", { staticClass: "fa fa-user" }), _vm._v(" Unfollow")]
-              ),
+          !_vm.isSelf
+            ? _c("div", [
+                !_vm.isFollowing
+                  ? _c(
+                      "button",
+                      {
+                        staticClass:
+                          "btn btn-outline-primary btn-sm follow-btn",
+                        attrs: { type: "button" },
+                        on: { click: _vm.followerUser }
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-user" }),
+                        _vm._v(" Follow")
+                      ]
+                    )
+                  : _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary btn-sm follow-btn",
+                        attrs: { type: "button" },
+                        on: { click: _vm.unFollowerUser }
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-user" }),
+                        _vm._v(" Unfollow")
+                      ]
+                    )
+              ])
+            : _vm._e(),
           _vm._v(" "),
           _c("b-card-text", { staticClass: "text-center" }, [
             _vm._v(

@@ -12,7 +12,7 @@ class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
-    protected $appends = ['is_following'];
+    protected $appends = ['is_following', 'is_self'];
 
     /**
      * The attributes that are mass assignable.
@@ -47,6 +47,14 @@ class User extends Authenticatable implements JWTSubject
         return !Auth::guest()  ? 
             in_array(Auth::user()->id, $this->followers()->pluck('following_user_id')->toArray()) : 
             -1;
+    }
+
+    public function getIsSelfAttribute()
+    {
+
+        return !Auth::guest()  ? 
+            (Auth::user()->id == $this->id) : 
+            false;
     }
 
     public function posts()

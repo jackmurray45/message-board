@@ -14,8 +14,10 @@
                 <b-card-title :title="profileData.name" style = "margin-top:10px;"/>
             </inertia-link>
 
-            <button  type="button" v-if = "!isFollowing" class="btn btn-outline-primary btn-sm follow-btn"  @click="followerUser"  ><i class="fa fa-user"></i> Follow</button>
-            <button  type="button" v-else class="btn btn-primary btn-sm follow-btn" @click="unFollowerUser" ><i class="fa fa-user"></i> Unfollow</button>
+            <div v-if="!isSelf">
+                <button  type="button" v-if = "!isFollowing" class="btn btn-outline-primary btn-sm follow-btn"  @click="followerUser"  ><i class="fa fa-user"></i> Follow</button>
+                <button  type="button" v-else class="btn btn-primary btn-sm follow-btn" @click="unFollowerUser" ><i class="fa fa-user"></i> Unfollow</button>
+            </div>
             
             <!-- <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-user"></i> Following</button> -->
             <b-card-text class = "text-center">
@@ -67,6 +69,7 @@ export default {
             backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
             headerLink: `/profiles/${this.$props.profileData.id}`,
             isFollowing: this.profileData.is_following != -1 && this.profileData.is_following,
+            isSelf: this.profileData.is_self
 
         }
             
