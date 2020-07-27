@@ -51,10 +51,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getIsSelfAttribute()
     {
-
-        return !Auth::guest()  ? 
-            (Auth::user()->id == $this->id) : 
-            false;
+        return !Auth::guest() ? (Auth::user()->id == $this->id) : false;
     }
 
     public function posts()
