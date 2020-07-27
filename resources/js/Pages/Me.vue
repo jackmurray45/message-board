@@ -3,6 +3,7 @@
        <Container>
             <update-user :user = "user" :errors="errors"/>
             <update-password :user = "user" :errors="errors"/>
+            <update-user-photos :user = "user" :errors="errors"/>
             
        </Container>
     </div>
@@ -13,18 +14,14 @@
 import Container from './Templates/Container'
 import UpdateUser from './Templates/UpdateUser'
 import UpdatePassword from './Templates/UpdatePassword'
+import UpdateUserPhotos from './Templates/UpdateUserPhotos'
 
 
 export default {
     props: {
         errors : {
             Type: Object,
-            default: {
-                email: [],
-                password: [],
-                name: [],
-                password_confirmation: [],
-            }
+            default: {}
 
         },
         user: Object
@@ -33,6 +30,7 @@ export default {
         Container,
         UpdateUser,
         UpdatePassword,
+        UpdateUserPhotos
     },
 
     methods: {

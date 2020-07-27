@@ -201,4 +201,11 @@ class ProfileController extends Controller
         //session()->flash('status', 'Password succesfully changed!'); 
         return $this->show($user->id);
     }
+
+    public function updateProfilePhoto(Request $request)
+    {
+        dd($request->all());
+        //session()->flash('status', 'Password succesfully changed!'); 
+        return $this->show($user->id);
+    }
 }

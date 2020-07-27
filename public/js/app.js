@@ -3544,6 +3544,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Templates_Container__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Templates/Container */ "./resources/js/Pages/Templates/Container.vue");
 /* harmony import */ var _Templates_UpdateUser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Templates/UpdateUser */ "./resources/js/Pages/Templates/UpdateUser.vue");
 /* harmony import */ var _Templates_UpdatePassword__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Templates/UpdatePassword */ "./resources/js/Pages/Templates/UpdatePassword.vue");
+/* harmony import */ var _Templates_UpdateUserPhotos__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Templates/UpdateUserPhotos */ "./resources/js/Pages/Templates/UpdateUserPhotos.vue");
 //
 //
 //
@@ -3555,6 +3556,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+
 
 
 
@@ -3562,19 +3565,15 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     errors: {
       Type: Object,
-      "default": {
-        email: [],
-        password: [],
-        name: [],
-        password_confirmation: []
-      }
+      "default": {}
     },
     user: Object
   },
   components: {
     Container: _Templates_Container__WEBPACK_IMPORTED_MODULE_0__["default"],
     UpdateUser: _Templates_UpdateUser__WEBPACK_IMPORTED_MODULE_1__["default"],
-    UpdatePassword: _Templates_UpdatePassword__WEBPACK_IMPORTED_MODULE_2__["default"]
+    UpdatePassword: _Templates_UpdatePassword__WEBPACK_IMPORTED_MODULE_2__["default"],
+    UpdateUserPhotos: _Templates_UpdateUserPhotos__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   methods: {}
 });
@@ -5053,6 +5052,124 @@ __webpack_require__.r(__webpack_exports__);
         email: this.user.email,
         bio: this.user.bio
       },
+      errorsData: this.errors
+    };
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue_loading_button__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-loading-button */ "./node_modules/vue-loading-button/dist/vue-loading-button.esm.js");
+/* harmony import */ var bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! bootstrap-vue */ "./node_modules/bootstrap-vue/esm/index.js");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    errors: {
+      Type: Object,
+      "default": {
+        profile_photo: [],
+        banner_photo: []
+      }
+    },
+    user: Object
+  },
+  components: {
+    VueLoadingButton: vue_loading_button__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  methods: {
+    validatePhoto: function validatePhoto(photo, pic) {
+      this.readyForSubmit = true; // this.errorsData = {
+      //     profile_photo: [],
+      //     banner_photo: [],
+      // }
+
+      if (!photo.match(/.(jpg|jpeg|png)$/i)) {
+        if (pic === "profile_photo") {
+          this.errorsData = {
+            profile_photo: ['File is not an image'],
+            banner_photo: this.errorsData.banner_photo
+          };
+        } else if (pic === "banner_photo") {
+          this.errorsData = {
+            banner_photo: ['File is not an image'],
+            profile_photo: this.errorsData.profile_photo
+          };
+        }
+      }
+    },
+    changeProfilePhoto: function changeProfilePhoto(event) {
+      var _this = this;
+
+      this.validatePhoto(event.target.files[0].type, 'profile_photo');
+
+      if (!this.readyForSubmit) {
+        return false;
+      }
+
+      var fileUpload = new FormData();
+      fileUpload.append('photo', event.target.files[0]);
+      this.sending = true;
+      this.$inertia.post("/profiles/".concat(this.user.id, "/profile_photo"), fileUpload).then(function () {
+        _this.sending = false;
+        _this.errorsData = _this.errors;
+      });
+    },
+    changeBannerPhoto: function changeBannerPhoto(event) {
+      var _this2 = this;
+
+      this.validatePhoto(event.target.files[0].type, 'banner_photo');
+
+      if (!this.readyForSubmit) {
+        return false;
+      }
+
+      this.sending = true;
+      this.$inertia.put("/profiles/".concat(this.user.id, "/banner_photo"), {
+        photo: event.target.files[0],
+        test: "hello"
+      }).then(function () {
+        _this2.sending = false;
+        _this2.errorsData = _this2.errors;
+      });
+    }
+  },
+  data: function data() {
+    return {
       errorsData: this.errors
     };
   }
@@ -39115,6 +39232,25 @@ exports.push([module.i, "\n.row[data-v-0eb59913]{\n    margin: 0 auto;\n}\n.form
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.row[data-v-84f86618]{\n    margin: 0 auto;\n}\n.form-group[data-v-84f86618]{\n    height:65px;\n}\n.icon-left[data-v-84f86618]{\n    position: relative;\n    z-index: 1;\n    left: 0px;\n    top: 23px;\n    color: black;\n    cursor: pointer;\n    width: 0;\n}\ninput[type=text][data-v-84f86618], input[type=password][data-v-84f86618], input[type=email][data-v-84f86618]{\n    outline: 0;\n    border-width: 0 0 2px;\n    border-color: black !important;\n    padding-left:22.5px;\n}\n.login-input + .buttom-border[data-v-84f86618] {\n    display:block;\n    border-top: solid 2px #019fb6;\n    width: 0%;\n    -webkit-transition: width 250ms ease-in-out;\n    transition: width 250ms ease-in-out;\n}\n.login-input:focus + .buttom-border[data-v-84f86618] {\n    width: 100%;          /*  used calc first, but won't work on Edge  */\n    -webkit-transition: width 250ms ease-in-out;\n    transition: width 250ms ease-in-out;\n}\n.buttom-border[data-v-84f86618]{\n    position: absolute !important;\n    top:48px;\n}\n.form-group[data-v-84f86618]{\n    padding-left:0px !important;\n    padding-right:0px !important;\n}\n.row[data-v-84f86618]{\n    padding: 15px;\n}\n.form-group[data-v-84f86618]{\n    margin-bottom:10px;\n}\n.group-buttons[data-v-84f86618]{\n    margin-top:15px;\n}\n.error-message[data-v-84f86618]{\n    color:red;\n}\n.user-photo[data-v-84f86618]{\n    width:100px;\n    height:100px;\n}\n.banner-photo[data-v-84f86618]{\n    height:200px;\n}\n.banner-photo-group[data-v-84f86618]{\n    margin-bottom:25px;\n}\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UserCard.vue?vue&type=style&index=0&id=06ecf49a&scoped=true&lang=css&":
 /*!*******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Templates/UserCard.vue?vue&type=style&index=0&id=06ecf49a&scoped=true&lang=css& ***!
@@ -43850,6 +43986,36 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../node_modules/css-loader??ref--6-1!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/src??ref--6-2!../../../../node_modules/vue-loader/lib??vue-loader-options!./UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UserCard.vue?vue&type=style&index=0&id=06ecf49a&scoped=true&lang=css&":
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Templates/UserCard.vue?vue&type=style&index=0&id=06ecf49a&scoped=true&lang=css& ***!
@@ -44596,6 +44762,10 @@ var render = function() {
           _c("update-user", { attrs: { user: _vm.user, errors: _vm.errors } }),
           _vm._v(" "),
           _c("update-password", {
+            attrs: { user: _vm.user, errors: _vm.errors }
+          }),
+          _vm._v(" "),
+          _c("update-user-photos", {
             attrs: { user: _vm.user, errors: _vm.errors }
           })
         ],
@@ -46233,6 +46403,117 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-lg-12 form-group" }, [
       _c("h2", [_vm._v("Update Profile")])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "row" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "col-lg-12 text-center",
+        staticStyle: { "margin-bottom": "25px" }
+      },
+      [
+        _c("div", { staticStyle: { "font-weight": "bold" } }, [
+          _vm._v("Profile Photo:")
+        ]),
+        _vm._v(" "),
+        _vm._m(1),
+        _vm._v(" "),
+        _c("input", {
+          ref: "profilePhoto",
+          staticClass: "btn btn-outline-success",
+          staticStyle: { "margin-top": "10px" },
+          attrs: { type: "file", name: "profilePhoto", value: "Change Photo" },
+          on: { change: _vm.changeProfilePhoto }
+        }),
+        _vm._v(" "),
+        _vm.errorsData != null &&
+        _vm.errorsData.profile_photo != null &&
+        _vm.errorsData.profile_photo.length > 0
+          ? _c("div", { staticClass: "error-message" }, [
+              _vm._v(_vm._s(_vm.errorsData.profile_photo[0]))
+            ])
+          : _vm._e()
+      ]
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-lg-12 text-center banner-photo-group" }, [
+      _c("div", { staticStyle: { "font-weight": "bold" } }, [
+        _vm._v("Banner Photo:")
+      ]),
+      _vm._v(" "),
+      _vm._m(2),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "btn btn-outline-success",
+        staticStyle: { "margin-top": "10px" },
+        attrs: { type: "file", name: "bannerPhoto", value: "Change Photo" },
+        on: { change: _vm.changeBannerPhoto }
+      }),
+      _vm._v(" "),
+      _vm.errorsData != null &&
+      _vm.errorsData.banner_photo != null &&
+      _vm.errorsData.banner_photo.length > 0
+        ? _c("div", { staticClass: "error-message" }, [
+            _vm._v(_vm._s(_vm.errorsData.banner_photo[0]))
+          ])
+        : _vm._e()
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-lg-12 form-group" }, [
+      _c("h4", [_vm._v("Update Photos")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c("img", {
+        staticClass: "user-photo",
+        attrs: { src: "/images/no-profile-pic.jpg" }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c("img", {
+        staticClass: "banner-photo",
+        attrs: { src: "/images/gray-background.jpg" }
+      })
     ])
   }
 ]
@@ -58907,6 +59188,8 @@ var map = {
 	"./Templates/UpdatePassword.vue": "./resources/js/Pages/Templates/UpdatePassword.vue",
 	"./Templates/UpdateUser": "./resources/js/Pages/Templates/UpdateUser.vue",
 	"./Templates/UpdateUser.vue": "./resources/js/Pages/Templates/UpdateUser.vue",
+	"./Templates/UpdateUserPhotos": "./resources/js/Pages/Templates/UpdateUserPhotos.vue",
+	"./Templates/UpdateUserPhotos.vue": "./resources/js/Pages/Templates/UpdateUserPhotos.vue",
 	"./Templates/UserCard": "./resources/js/Pages/Templates/UserCard.vue",
 	"./Templates/UserCard.vue": "./resources/js/Pages/Templates/UserCard.vue",
 	"./Templates/WriteComment": "./resources/js/Pages/Templates/WriteComment.vue",
@@ -60720,6 +61003,93 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUser_vue_vue_type_template_id_0eb59913_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUser_vue_vue_type_template_id_0eb59913_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Templates/UpdateUserPhotos.vue":
+/*!***********************************************************!*\
+  !*** ./resources/js/Pages/Templates/UpdateUserPhotos.vue ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _UpdateUserPhotos_vue_vue_type_template_id_84f86618_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true& */ "./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true&");
+/* harmony import */ var _UpdateUserPhotos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./UpdateUserPhotos.vue?vue&type=script&lang=js& */ "./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css& */ "./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _UpdateUserPhotos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _UpdateUserPhotos_vue_vue_type_template_id_84f86618_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _UpdateUserPhotos_vue_vue_type_template_id_84f86618_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "84f86618",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Pages/Templates/UpdateUserPhotos.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=script&lang=js&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./UpdateUserPhotos.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css&":
+/*!********************************************************************************************************************!*\
+  !*** ./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css& ***!
+  \********************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader!../../../../node_modules/css-loader??ref--6-1!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/src??ref--6-2!../../../../node_modules/vue-loader/lib??vue-loader-options!./UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=style&index=0&id=84f86618&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_style_index_0_id_84f86618_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true&":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true& ***!
+  \******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_template_id_84f86618_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Pages/Templates/UpdateUserPhotos.vue?vue&type=template&id=84f86618&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_template_id_84f86618_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_UpdateUserPhotos_vue_vue_type_template_id_84f86618_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
