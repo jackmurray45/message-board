@@ -12,6 +12,8 @@ use App\Http\Resources\Profile as ProfileResource;
 use Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\Filesystem;
 
 class ProfileController extends Controller
 {
@@ -204,8 +206,15 @@ class ProfileController extends Controller
 
     public function updateProfilePhoto(Request $request)
     {
-        dd($request->all());
-        //session()->flash('status', 'Password succesfully changed!'); 
-        return $this->show($user->id);
+        Storage::put('file.txt', "content");
+        dd(1);
+        $path = "images/profile_photos/{$request->user()->id}";
+        
+        dd(Storage::url("images/profile_photos/{$request->user()->id}"));
+        $photoPath = $request->photo->store($path);
+        
+        $request->user()->update(['profile_pic' => $photoPath]);
+
+        return $this->show($request->user()->id);
     }
 }
