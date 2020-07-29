@@ -4468,7 +4468,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       profilePhoto: this.$props.profileData.profile_pic ? this.$props.profileData.profile_pic : "/images/no-profile-pic.jpg",
-      backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
+      backgroundPhoto: this.$props.profileData.banner_pic ? this.$props.profileData.banner_pic : "/images/gray-background.jpg",
       headerLink: "/profiles/".concat(this.$props.profileData.id),
       isFollowing: this.profileData.is_following != -1 && this.profileData.is_following,
       isSelf: this.profileData.is_self
@@ -5158,19 +5158,23 @@ __webpack_require__.r(__webpack_exports__);
         return false;
       }
 
+      var fileUpload = new FormData();
+      fileUpload.append('photo', event.target.files[0]);
       this.sending = true;
-      this.$inertia.put("/profiles/".concat(this.user.id, "/banner_photo"), {
-        photo: event.target.files[0],
-        test: "hello"
-      }).then(function () {
+      this.$inertia.post("/profiles/".concat(this.user.id, "/banner_photo"), fileUpload).then(function () {
         _this2.sending = false;
         _this2.errorsData = _this2.errors;
       });
+    },
+    getImage: function getImage(image) {
+      return image;
     }
   },
   data: function data() {
     return {
-      errorsData: this.errors
+      errorsData: this.errors,
+      profilePhoto: this.$props.user.profile_pic ? this.$props.user.profile_pic : "/images/no-profile-pic.jpg",
+      backgroundPhoto: this.$props.user.banner_pic ? this.$props.user.banner_pic : "/images/gray-background.jpg"
     };
   }
 });
@@ -46441,7 +46445,12 @@ var render = function() {
           _vm._v("Profile Photo:")
         ]),
         _vm._v(" "),
-        _vm._m(1),
+        _c("div", [
+          _c("img", {
+            staticClass: "user-photo rounded-circle",
+            attrs: { src: _vm.profilePhoto }
+          })
+        ]),
         _vm._v(" "),
         _c("input", {
           ref: "profilePhoto",
@@ -46466,7 +46475,12 @@ var render = function() {
         _vm._v("Banner Photo:")
       ]),
       _vm._v(" "),
-      _vm._m(2),
+      _c("div", [
+        _c("img", {
+          staticClass: "banner-photo",
+          attrs: { src: _vm.backgroundPhoto }
+        })
+      ]),
       _vm._v(" "),
       _c("input", {
         staticClass: "btn btn-outline-success",
@@ -46492,28 +46506,6 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-lg-12 form-group" }, [
       _c("h4", [_vm._v("Update Photos")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [
-      _c("img", {
-        staticClass: "user-photo",
-        attrs: { src: "/images/no-profile-pic.jpg" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [
-      _c("img", {
-        staticClass: "banner-photo",
-        attrs: { src: "/images/gray-background.jpg" }
-      })
     ])
   }
 ]

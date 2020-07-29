@@ -7,7 +7,7 @@
         <div class="col-lg-12 text-center" style = "margin-bottom:25px;">
             <div style="font-weight:bold">Profile Photo:</div>
             <div>
-                <img src = "/images/no-profile-pic.jpg" class = "user-photo">
+                <img :src = "profilePhoto" class = "user-photo rounded-circle">
             </div>
             <input type="file" @change="changeProfilePhoto" class="btn btn-outline-success" ref = 'profilePhoto' style="margin-top:10px;" name = 'profilePhoto' value = 'Change Photo'>
             <div class = 'error-message' v-if="errorsData != null && errorsData.profile_photo != null && errorsData.profile_photo.length > 0">{{errorsData.profile_photo[0]}}</div>
@@ -15,7 +15,7 @@
         <div class="col-lg-12 text-center banner-photo-group">
             <div style="font-weight:bold">Banner Photo:</div>
             <div>
-                <img src = "/images/gray-background.jpg" class = "banner-photo">
+                <img :src = "backgroundPhoto" class = "banner-photo">
             </div>
             <input type="file" class="btn btn-outline-success" @change="changeBannerPhoto" style="margin-top:10px;" name = 'bannerPhoto' value = 'Change Photo'>
             <div class = 'error-message' v-if="errorsData != null && errorsData.banner_photo != null && errorsData.banner_photo.length > 0">{{errorsData.banner_photo[0]}}</div>
@@ -89,20 +89,27 @@ export default {
                 return false;
             }
             
+            let fileUpload = new FormData();
+            fileUpload.append('photo', event.target.files[0]);
+
             this.sending = true
-            this.$inertia.put(`/profiles/${this.user.id}/banner_photo`, {
-                photo: event.target.files[0],
-                test: "hello"
-            }).then(() => {
+            this.$inertia.post(`/profiles/${this.user.id}/banner_photo`, fileUpload).then(() => {
                 this.sending = false;
                 this.errorsData = this.errors;
             }) 
+        },
+
+        getImage(image)
+        {
+            return image;
         }
         
     },
     data() {
         return {
-            errorsData: this.errors
+            errorsData: this.errors,
+            profilePhoto: this.$props.user.profile_pic ? this.$props.user.profile_pic : "/images/no-profile-pic.jpg",
+            backgroundPhoto: this.$props.user.banner_pic ? this.$props.user.banner_pic : "/images/gray-background.jpg",
 
         }
             

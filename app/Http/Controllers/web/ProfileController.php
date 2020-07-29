@@ -14,6 +14,7 @@ use Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
+use App\Helpers\ImageHelper;
 
 class ProfileController extends Controller
 {
@@ -99,6 +100,7 @@ class ProfileController extends Controller
                 $followId = $follow->id;
             }
         }
+
         //return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
         return inertia('Profile', [
             'profile' => $user,
@@ -206,14 +208,31 @@ class ProfileController extends Controller
 
     public function updateProfilePhoto(Request $request)
     {
-        Storage::put('file.txt', "content");
-        dd(1);
-        $path = "images/profile_photos/{$request->user()->id}";
         
-        dd(Storage::url("images/profile_photos/{$request->user()->id}"));
+
+        $resizedImage = ImageHelper::resizeImage($request->photo, 100, 100);
+
+        $imageName = md5($request->photo->getClientOriginalName());
+ 
+        $dbPath = "images/profile_photos/{$request->user()->id}/$imageName.png";
+        $savedPath = public_path("storage/$dbPath");
+
+        //Save image
+        $resizedImage->save($savedPath);
+        
+        $request->user()->update(['profile_pic' => "$dbPath"]);
+
+        return $this->show($request->user()->id);
+    }
+
+    public function updateBannerPhoto(Request $request)
+    {
+        $path = "images/banner_photos/{$request->user()->id}";
+        //dd($path);
+        
         $photoPath = $request->photo->store($path);
         
-        $request->user()->update(['profile_pic' => $photoPath]);
+        $request->user()->update(['banner_pic' => $photoPath]);
 
         return $this->show($request->user()->id);
     }

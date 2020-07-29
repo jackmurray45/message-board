@@ -66,7 +66,7 @@ export default {
     data() {
         return {
             profilePhoto: this.$props.profileData.profile_pic ? this.$props.profileData.profile_pic : "/images/no-profile-pic.jpg",
-            backgroundPhoto: this.$props.profileData.background_pic ? this.$props.profileData.background_pic : "/images/gray-background.jpg",
+            backgroundPhoto: this.$props.profileData.banner_pic ? this.$props.profileData.banner_pic : "/images/gray-background.jpg",
             headerLink: `/profiles/${this.$props.profileData.id}`,
             isFollowing: this.profileData.is_following != -1 && this.profileData.is_following,
             isSelf: this.profileData.is_self

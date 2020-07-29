@@ -48,6 +48,16 @@ class User extends Authenticatable implements JWTSubject
             -1;
     }
 
+    public function getProfilePicAttribute($value)
+    {
+        return $this->attributes['profile_pic'] =  $this->attributes['profile_pic'] ? "/storage/$value" : null;
+    }
+
+    public function getBannerPicAttribute($value)
+    {
+        return $this->attributes['banner_pic'] =  $this->attributes['banner_pic'] ? "/storage/$value" : null;
+    }
+
     public function getIsSelfAttribute()
     {
         return !Auth::guest() ? (Auth::user()->id == $this->id) : false;
