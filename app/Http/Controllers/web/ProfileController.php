@@ -231,7 +231,7 @@ class ProfileController extends Controller
         
         $request->user()->update([$request->pic_option => "$dbPath"]);
 
-        return $this->show($request->user()->id);
+        return redirect("profiles/{$request->user()->id}");
     }
 
 }
