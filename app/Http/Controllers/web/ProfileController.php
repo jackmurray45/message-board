@@ -206,34 +206,32 @@ class ProfileController extends Controller
         return $this->show($user->id);
     }
 
-    public function updateProfilePhoto(Request $request)
+    public function updatePhoto(Request $request)
     {
         
-
-        $resizedImage = ImageHelper::resizeImage($request->photo, 100, 100);
+        $this->validate($request, [
+            'pic_option' => 'required|in:profile_pic,banner_pic',
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+        
+        $resizedImage = $request->pic_option == 'profile_pic' ? ImageHelper::resizeImage($request->photo, 100, 100) : ImageHelper::resizeImage($request->photo, 750, 200);
 
         $imageName = md5($request->photo->getClientOriginalName());
- 
-        $dbPath = "images/profile_photos/{$request->user()->id}/$imageName.png";
+
+        $directoryPath = "images/{$request->pic_option}/{$request->user()->id}";
+
+        Storage::deleteDirectory($directoryPath);
+        Storage::makeDirectory($directoryPath);
+
+        $dbPath = "$directoryPath/$imageName.png";
         $savedPath = public_path("storage/$dbPath");
 
         //Save image
         $resizedImage->save($savedPath);
         
-        $request->user()->update(['profile_pic' => "$dbPath"]);
+        $request->user()->update([$request->pic_option => "$dbPath"]);
 
         return $this->show($request->user()->id);
     }
 
-    public function updateBannerPhoto(Request $request)
-    {
-        $path = "images/banner_photos/{$request->user()->id}";
-        //dd($path);
-        
-        $photoPath = $request->photo->store($path);
-        
-        $request->user()->update(['banner_pic' => $photoPath]);
-
-        return $this->show($request->user()->id);
-    }
 }

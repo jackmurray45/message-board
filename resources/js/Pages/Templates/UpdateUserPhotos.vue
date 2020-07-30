@@ -75,34 +75,31 @@ export default {
             
             let fileUpload = new FormData();
             fileUpload.append('photo', event.target.files[0]);
+            fileUpload.append('pic_option', 'profile_pic');
 
             this.sending = true
-            this.$inertia.post(`/profiles/${this.user.id}/profile_photo`, fileUpload).then(() => {
+            this.$inertia.post(`/profiles/${this.user.id}/update_photo`, fileUpload).then(() => {
                 this.sending = false;
                 this.errorsData = this.errors;
             }) 
         },
 
         changeBannerPhoto(event){
-            this.validatePhoto(event.target.files[0].type, 'banner_photo')
+            this.validatePhoto(event.target.files[0].type, 'banner_pic')
             if(!this.readyForSubmit){
                 return false;
             }
             
             let fileUpload = new FormData();
             fileUpload.append('photo', event.target.files[0]);
+            fileUpload.append('pic_option', 'banner_pic');
 
             this.sending = true
-            this.$inertia.post(`/profiles/${this.user.id}/banner_photo`, fileUpload).then(() => {
+            this.$inertia.post(`/profiles/${this.user.id}/update_photo`, fileUpload).then(() => {
                 this.sending = false;
                 this.errorsData = this.errors;
             }) 
         },
-
-        getImage(image)
-        {
-            return image;
-        }
         
     },
     data() {

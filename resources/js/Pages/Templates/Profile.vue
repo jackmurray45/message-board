@@ -80,6 +80,10 @@ export default {
 </script>
 
 <style scoped>
+.card-img-top{
+    max-height: 350px !important;
+    min-height:100px !important;
+}
 </style>
 
 <style>
