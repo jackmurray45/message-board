@@ -13,6 +13,7 @@ use Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
 use App\Helpers\ImageHelper;
+use App\Http\Requests\StoreUser;
 
 class ProfileController extends Controller
 {
@@ -98,25 +99,12 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(StoreUser $request, $id)
     {        
-        $request->validate([
-            'email' => "unique:users,email,$id,id",
-            'name' => 'required|max:255',
-            "bio" => 'nullable'
-        ]);
 
-        $user = User::findOrFail($id);
-        if($user->id == Auth::user()->id)
-        {
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->bio = $request->bio;
-            $user->save();
-            //session()->flash('status', 'Your Account has been successfully updated!');  
-        }
+        User::findOrFail($id)->update($request->validated());
 
-        return $this->show($user->id);
+        return $this->show($id);
     }
 
     /**
