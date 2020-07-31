@@ -134,7 +134,7 @@ class UserTest extends TestCase
         $this->assertEquals(Follow::count(), 0);
     }
 
-    public function testDeleteFollow()
+    public function testDeleteFollowFail()
     {
         $user1 = factory(User::class)->create();
         $user2 = factory(User::class)->create();
@@ -145,6 +145,21 @@ class UserTest extends TestCase
 
         $this->assertEquals(Follow::count(), 1);
         $response = $this->actingAs($user1)->delete("/profiles/1");
+        $this->assertEquals(Follow::count(), 1);
+
+    }
+
+    public function testDeleteFollowPass()
+    {
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+
+        $response = $this->actingAs($user1)->post("/profiles", [
+            'user' => $user2->id,
+        ]);
+
+        $this->assertEquals(Follow::count(), 1);
+        $response = $this->actingAs($user1)->delete("/profiles/".$user2->id);
         $this->assertEquals(Follow::count(), 0);
 
     }

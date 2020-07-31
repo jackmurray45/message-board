@@ -11,7 +11,10 @@ Use App\Post;
 use App\Http\Resources\Profile as ProfileResource;
 use Auth;
 use Hash;
-use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\Filesystem;
+use App\Helpers\ImageHelper;
 
 class ProfileController extends Controller
 {
@@ -20,6 +23,7 @@ class ProfileController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']] );
+        $this->middleware('check.following', ['index']);
     }
 
     /**
@@ -27,21 +31,24 @@ class ProfileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $followMap = [];
-        $users = User::orderBy('created_at', 'DESC')->paginate(20);
-        if(!Auth::guest())
+
+        if($request->following == 1)
         {
-            $followCollection = Auth::user()->following;
-            foreach($followCollection as $follow)
-            {
-                $followMap[$follow->followed_user_id] = $follow->id;
-            }
+            $users = User::select('users.*')->join('follows', 'users.id', '=', 'follows.followed_user_id')
+            ->where('following_user_id', '=', Auth::user()->id)->orderBy('follows.created_at', 'DESC')->paginate(20);
+            $users->put('is_following', true)->pop();
         }
-        
-        
-        return view('profile.index')->with('users', $users)->with('followMap', $followMap);
+        else
+        {
+            $users = User::orderBy('created_at', 'DESC')->paginate(20);
+        }
+                
+        return inertia('Profiles', [
+            'profiles' => $users,
+        ]);
+
     }
 
     
@@ -55,7 +62,7 @@ class ProfileController extends Controller
     public function store(Request $request)
     {
 
-        $message = 'User successfully followed!';
+        $success = 1;
 
         if(Auth::user()->id != $request->user && User::find($request->user))
         {
@@ -66,11 +73,10 @@ class ProfileController extends Controller
         }
         else
         {
-            $message = "Error following user";
+            $success = 0;
         }
 
-        session()->flash('status', $message);
-        return back();
+        return response()->json(['success' => $success]);
         
     }
 
@@ -83,6 +89,7 @@ class ProfileController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
+
         $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'DESC')->paginate(10);
         $followId = null;
         if(!Auth::guest())
@@ -93,7 +100,13 @@ class ProfileController extends Controller
                 $followId = $follow->id;
             }
         }
-        return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
+
+        //return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
+        return inertia('Profile', [
+            'profile' => $user,
+            'posts' => $posts,
+            'followId' => $followId == null
+        ]);
     }
 
 
@@ -109,7 +122,8 @@ class ProfileController extends Controller
     {        
         $request->validate([
             'email' => "unique:users,email,$id,id",
-            'name' => 'required|max:255'
+            'name' => 'required|max:255',
+            "bio" => 'nullable'
         ]);
 
         $user = User::findOrFail($id);
@@ -119,10 +133,10 @@ class ProfileController extends Controller
             $user->email = $request->email;
             $user->bio = $request->bio;
             $user->save();
-            session()->flash('status', 'Your Account has been successfully updated!');  
+            //session()->flash('status', 'Your Account has been successfully updated!');  
         }
 
-        return back();
+        return $this->show($user->id);
     }
 
     /**
@@ -133,19 +147,28 @@ class ProfileController extends Controller
      */
     public function destroy($id)
     {
-        $follow = Follow::findOrFail($id);
+        $follow = Follow::where([
+            ['following_user_id', '=', Auth::user()->id],
+            ['followed_user_id', '=', $id]
+        ])->first();
+        
         if(isset($follow) && $follow->following_user_id == Auth::user()->id)
         {
             $follow->delete();
             session()->flash('status', 'User successfully Unfollowed!'); 
         }
-        return back();
+        return response()->json(['success' => 1]);
     }
 
     public function myProfile()
     {
         $user = Auth::user();
-        return view('profile.me')->with('user', $user)->with('posts', $user->posts);
+        //return view('profile.me')->with('user', $user)->with('posts', $user->posts);
+        //dd($user);
+        return inertia('Me', [
+            'user' => $user
+        ]);
+        
     }
 
     public function followingProfiles()
@@ -164,22 +187,51 @@ class ProfileController extends Controller
     public function updateAuthUserPassword(Request $request)
     {
         $this->validate($request, [
-            'current' => 'required',
+            'old_password' => 'required',
             'password' => 'required|confirmed',
             'password_confirmation' => 'required'
         ]);
 
         $user = Auth::user();
-
-        if (!Hash::check($request->current, $user->password)) {
-            $errors = new MessageBag;
-            $errors->add('password', 'Current password does not match');
-            return redirect('profiles/me')->withErrors($errors);  
+        if (!Hash::check($request->old_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'old_password' => ['the old password is incorrect.']
+            ]);
+            
         }
 
         $user->password = Hash::make($request->password);
         $user->save();
-        session()->flash('status', 'Password succesfully changed!'); 
-        return back();
+        //session()->flash('status', 'Password succesfully changed!'); 
+        return $this->show($user->id);
     }
+
+    public function updatePhoto(Request $request)
+    {
+        
+        $this->validate($request, [
+            'pic_option' => 'required|in:profile_pic,banner_pic',
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+        
+        $resizedImage = $request->pic_option == 'profile_pic' ? ImageHelper::resizeImage($request->photo, 100, 100) : ImageHelper::resizeImage($request->photo, 750, 200);
+
+        $imageName = md5($request->photo->getClientOriginalName());
+
+        $directoryPath = "images/{$request->pic_option}/{$request->user()->id}";
+
+        Storage::deleteDirectory($directoryPath);
+        Storage::makeDirectory($directoryPath);
+
+        $dbPath = "$directoryPath/$imageName.png";
+        $savedPath = public_path("storage/$dbPath");
+
+        //Save image
+        $resizedImage->save($savedPath);
+        
+        $request->user()->update([$request->pic_option => "$dbPath"]);
+
+        return redirect("profiles/{$request->user()->id}");
+    }
+
 }

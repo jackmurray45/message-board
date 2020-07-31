@@ -23,12 +23,26 @@ class PostController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']]);
+        $this->middleware('check.following', ['index']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        return view('post.index')->with('posts', $posts);
+
+        if($request->following == 1)
+        {
+            $posts = Post::join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
+            ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
+        }
+        else
+        {
+            $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
+        }
+
+        return inertia('Posts', [
+            'posts' => $posts
+        ]);
+
     }
 
     /**
@@ -74,9 +88,12 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::findOrFail($id);
-        $comments = $post->comments()->paginate(10);
 
-        return view('post.show')->with('post', $post)->with('comments', $comments);
+        $comments = $post->comments()->paginate(10);
+        return inertia('Post', [
+            'post' => $post,
+            'comments' => $comments
+        ]);
     }
 
     /**

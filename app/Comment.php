@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
+
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['post', 'user'];
+
     public function post()
     {
         return $this->belongsTo('App\Post', 'post_id', 'id');

@@ -16,7 +16,8 @@ Route::get('posts/following', 'web\PostController@followingPosts')->name('posts.
 Route::resource('posts', 'web\PostController');
 Route::get('profiles/following', 'web\ProfileController@followingProfiles')->name('profiles.following');
 Route::get('profiles/me', 'web\ProfileController@myProfile')->name('profiles.me');
-Route::post('profile/me', 'web\ProfileController@updateAuthUserPassword')->name('profiles.password');
+Route::put('profiles/password', 'web\ProfileController@updateAuthUserPassword')->name('profiles.password');
+Route::post('profiles/{id}/update_photo', 'web\ProfileController@updatePhoto');
 Route::resource('profiles', 'web\ProfileController');
 Route::resource('comments', 'web\CommentController');
 

@@ -6,20 +6,22 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Auth;
 
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+
+    protected $appends = ['is_following', 'is_self'];
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'email', 'password',
+    protected $guarded = [
+        'id'
     ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -37,6 +39,29 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getIsFollowingAttribute()
+    {
+
+        return !Auth::guest()  ? 
+            in_array(Auth::user()->id, $this->followers()->pluck('following_user_id')->toArray()) : 
+            -1;
+    }
+
+    public function getProfilePicAttribute($value)
+    {
+        return $this->attributes['profile_pic'] =  $this->attributes['profile_pic'] ? "/storage/$value" : null;
+    }
+
+    public function getBannerPicAttribute($value)
+    {
+        return $this->attributes['banner_pic'] =  $this->attributes['banner_pic'] ? "/storage/$value" : null;
+    }
+
+    public function getIsSelfAttribute()
+    {
+        return !Auth::guest() ? (Auth::user()->id == $this->id) : false;
+    }
 
     public function posts()
     {

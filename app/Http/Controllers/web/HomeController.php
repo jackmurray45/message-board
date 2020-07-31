@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Post;
 use App\User;
+use Auth;
 
 class HomeController extends Controller
 {
     
-
     /**
      * Show the application dashboard.
      *
@@ -20,6 +20,9 @@ class HomeController extends Controller
     {
         $posts = Post::orderBy('created_at', 'DESC')->limit(10)->get();
         $users = User::orderBy('created_at', 'DESC')->limit(10)->get();
-        return view('home')->with('posts', $posts)->with('users', $users);
+        return inertia('Dashboard', [
+            'posts' => $posts,
+            'users' => $users
+        ]);
     }
 }
