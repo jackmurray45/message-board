@@ -12,8 +12,6 @@ use App\Http\Resources\Profile as ProfileResource;
 use Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Filesystem\Filesystem;
 use App\Helpers\ImageHelper;
 
 class ProfileController extends Controller
@@ -209,25 +207,13 @@ class ProfileController extends Controller
     public function updatePhoto(Request $request)
     {
         
-        $this->validate($request, [
+        $request->validate([
             'pic_option' => 'required|in:profile_pic,banner_pic',
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         
-        $resizedImage = $request->pic_option == 'profile_pic' ? ImageHelper::resizeImage($request->photo, 100, 100) : ImageHelper::resizeImage($request->photo, 750, 200);
 
-        $imageName = md5($request->photo->getClientOriginalName());
-
-        $directoryPath = "images/{$request->pic_option}/{$request->user()->id}";
-
-        Storage::deleteDirectory($directoryPath);
-        Storage::makeDirectory($directoryPath);
-
-        $dbPath = "$directoryPath/$imageName.png";
-        $savedPath = public_path("storage/$dbPath");
-
-        //Save image
-        $resizedImage->save($savedPath);
+        $dbPath = ImageHelper::storeProfileImage($request->photo, $request->pic_option);
         
         $request->user()->update([$request->pic_option => "$dbPath"]);
 
