@@ -122,13 +122,9 @@ class ProfileController extends Controller
 
     public function myProfile()
     {
-        $user = Auth::user();
-        //return view('profile.me')->with('user', $user)->with('posts', $user->posts);
-        //dd($user);
         return inertia('Me', [
-            'user' => $user
+            'user' => auth()->user()
         ]);
-        
     }
 
     public function updateAuthUserPassword(Request $request)
