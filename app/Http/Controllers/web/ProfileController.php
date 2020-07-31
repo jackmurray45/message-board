@@ -32,16 +32,9 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
 
-        if($request->following == 1)
-        {
-            $users = User::select('users.*')->join('follows', 'users.id', '=', 'follows.followed_user_id')
-            ->where('following_user_id', '=', Auth::user()->id)->orderBy('follows.created_at', 'DESC')->paginate(20);
-            $users->put('is_following', true)->pop();
-        }
-        else
-        {
-            $users = User::orderBy('created_at', 'DESC')->paginate(20);
-        }
+        $users = $request->following == 1 ? 
+            auth()->user()->following()->paginate(20) : 
+            User::orderBy('created_at', 'DESC')->paginate(20);
                 
         return inertia('Profiles', [
             'profiles' => $users,
@@ -49,32 +42,21 @@ class ProfileController extends Controller
 
     }
 
-    
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function followUser($id)
     {
 
-        $success = 1;
+        auth()->user()->following()->syncWithoutDetaching($id);
 
-        if(Auth::user()->id != $request->user && User::find($request->user))
-        {
-            $follow = new Follow;
-            $follow->following_user_id = Auth::user()->id;
-            $follow->followed_user_id = $request->user;
-            $follow->save(); 
-        }
-        else
-        {
-            $success = 0;
-        }
+        return response(null, 204);
+        
+    }
 
-        return response()->json(['success' => $success]);
+    public function unfollowUser($id)
+    {
+
+        auth()->user()->following()->detach($id);
+
+        return response(null, 204);
         
     }
 
@@ -116,7 +98,7 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {        
         $request->validate([
             'email' => "unique:users,email,$id,id",
@@ -143,19 +125,11 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $follow = Follow::where([
-            ['following_user_id', '=', Auth::user()->id],
-            ['followed_user_id', '=', $id]
-        ])->first();
-        
-        if(isset($follow) && $follow->following_user_id == Auth::user()->id)
-        {
-            $follow->delete();
-            session()->flash('status', 'User successfully Unfollowed!'); 
-        }
-        return response()->json(['success' => 1]);
+        $user->delete();
+
+        return redirect('/');
     }
 
     public function myProfile()
@@ -167,19 +141,6 @@ class ProfileController extends Controller
             'user' => $user
         ]);
         
-    }
-
-    public function followingProfiles()
-    {
-        $followCollection = User::select('users.*', 'follows.id as follow_id')->join('follows', 'users.id', '=', 'follows.followed_user_id')
-        ->where('following_user_id', '=', Auth::user()->id)->orderBy('follows.created_at', 'DESC')->paginate(20);
-
-        $followMap = [];
-        foreach($followCollection as $follow)
-        {
-            $followMap[$follow->id] = $follow->follow_id;
-        }
-        return view('profile.index')->with('users', $followCollection)->with('followMap', $followMap);
     }
 
     public function updateAuthUserPassword(Request $request)
@@ -212,7 +173,6 @@ class ProfileController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         
-
         $dbPath = ImageHelper::storeProfileImage($request->photo, $request->pic_option);
         
         $request->user()->update([$request->pic_option => "$dbPath"]);

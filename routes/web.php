@@ -11,14 +11,23 @@
 |
 */
 
-Route::get('/', 'web\HomeController@index')->name('home.index');
-Route::get('posts/following', 'web\PostController@followingPosts')->name('posts.following');
+Route::get('/', 'web\HomeController@index');
+
+//Post routes
+Route::get('posts/following', 'web\PostController@followingPosts');
 Route::resource('posts', 'web\PostController');
-Route::get('profiles/following', 'web\ProfileController@followingProfiles')->name('profiles.following');
-Route::get('profiles/me', 'web\ProfileController@myProfile')->name('profiles.me');
-Route::put('profiles/password', 'web\ProfileController@updateAuthUserPassword')->name('profiles.password');
-Route::post('profiles/{id}/update_photo', 'web\ProfileController@updatePhoto');
+
+//Profile routes
+Route::prefix('profiles')->group(function() {
+    Route::get('me', 'web\ProfileController@myProfile');
+    Route::put('password', 'web\ProfileController@updateAuthUserPassword');
+    Route::post('{id}/update_photo', 'web\ProfileController@updatePhoto');
+    Route::post('{id}/follow', 'web\ProfileController@followUser');
+    Route::delete('{id}/follow', 'web\ProfileController@unfollowUser');
+});
 Route::resource('profiles', 'web\ProfileController');
+
+//Comment routes
 Route::resource('comments', 'web\CommentController');
 
 
