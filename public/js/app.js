@@ -4454,7 +4454,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       this.isFollowing = true;
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("/profiles?user=".concat(this.profileData.id), {}).then(function () {
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("/profiles/".concat(this.profileData.id, "/follow"), {}).then(function () {
         return null;
       });
     },
@@ -4465,7 +4465,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       this.isFollowing = false;
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a["delete"]("/profiles/".concat(this.profileData.id), {}).then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a["delete"]("/profiles/".concat(this.profileData.id, "/follow"), {}).then(function (response) {
         return null;
       });
     }

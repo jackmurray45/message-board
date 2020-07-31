@@ -52,7 +52,7 @@ export default {
                 return false
             }
             this.isFollowing = true; 
-            axios.post(`/profiles?user=${this.profileData.id}`, {}).then(() => null)
+            axios.post(`/profiles/${this.profileData.id}/follow`, {}).then(() => null)
         },
         unFollowerUser(){
             if(this.profileData.is_following == -1){
@@ -60,7 +60,7 @@ export default {
                 return false
             }
             this.isFollowing = false; 
-            axios.delete(`/profiles/${this.profileData.id}`, {}).then((response) => null)
+            axios.delete(`/profiles/${this.profileData.id}/follow`, {}).then((response) => null)
         }
     },
     data() {
