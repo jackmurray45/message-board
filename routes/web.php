@@ -19,13 +19,13 @@ Route::resource('posts', 'web\PostController');
 
 //Profile routes
 Route::prefix('profiles')->group(function() {
-    Route::get('me', 'web\ProfileController@myProfile');
-    Route::put('password', 'web\ProfileController@updateAuthUserPassword');
-    Route::post('{id}/update_photo', 'web\ProfileController@updatePhoto');
-    Route::post('{id}/follow', 'web\ProfileController@followUser');
-    Route::delete('{id}/follow', 'web\ProfileController@unfollowUser');
+    Route::get('me', 'web\UserController@myProfile');
+    Route::put('password', 'web\UserController@updateAuthUserPassword');
+    Route::post('{id}/update_photo', 'web\UserController@updatePhoto');
+    Route::post('{id}/follow', 'web\UserController@followUser');
+    Route::delete('{id}/follow', 'web\UserController@unfollowUser');
 });
-Route::resource('profiles', 'web\ProfileController');
+Route::resource('profiles', 'web\UserController');
 
 //Comment routes
 Route::resource('comments', 'web\CommentController');

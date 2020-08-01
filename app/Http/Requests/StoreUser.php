@@ -13,7 +13,6 @@ class StoreUser extends FormRequest
      */
     public function authorize()
     {
-
         return !auth()->guest() && (auth()->user()->id == $this->route('profile'));
     }
 

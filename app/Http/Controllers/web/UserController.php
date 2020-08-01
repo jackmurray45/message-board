@@ -2,27 +2,22 @@
 
 namespace App\Http\Controllers\web;
 
-use Request as UrlRequest;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreUser;
 use App\Http\Controllers\Controller;
 use App\User;
-use App\Follow;
-Use App\Post;
-use App\Http\Resources\Profile as ProfileResource;
-use Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
 use App\Helpers\ImageHelper;
-use App\Http\Requests\StoreUser;
 
-class ProfileController extends Controller
+
+class UserController extends Controller
 {
 
 
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']] );
-        $this->middleware('check.following', ['index']);
     }
 
     /**
@@ -70,23 +65,11 @@ class ProfileController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
+        $posts = $user->posts()->orderBy('created_at', 'DESC')->paginate(10);
 
-        $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'DESC')->paginate(10);
-        $followId = null;
-        if(!Auth::guest())
-        {
-            $follow = $user->followers->where('following_user_id', Auth::user()->id)->first();
-            if($follow)
-            {   
-                $followId = $follow->id;
-            }
-        }
-
-        //return view('profile.show')->with('user', $user)->with('posts', $posts)->with('followId', $followId);
         return inertia('Profile', [
             'profile' => $user,
             'posts' => $posts,
-            'followId' => $followId == null
         ]);
     }
 
@@ -135,7 +118,7 @@ class ProfileController extends Controller
             'password_confirmation' => 'required'
         ]);
 
-        $user = Auth::user();
+        $user = auth()->user();
         if (!Hash::check($request->old_password, $user->password)) {
             throw ValidationException::withMessages([
                 'old_password' => ['the old password is incorrect.']
@@ -143,9 +126,8 @@ class ProfileController extends Controller
             
         }
 
-        $user->password = Hash::make($request->password);
-        $user->save();
-        //session()->flash('status', 'Password succesfully changed!'); 
+        $user->update(['password' => Hash::make($request->password)]);
+
         return $this->show($user->id);
     }
 
@@ -159,7 +141,7 @@ class ProfileController extends Controller
         
         $dbPath = ImageHelper::storeProfileImage($request->photo, $request->pic_option);
         
-        $request->user()->update([$request->pic_option => "$dbPath"]);
+        auth()->user()->update([$request->pic_option => "$dbPath"]);
 
         return redirect("profiles/{$request->user()->id}");
     }
