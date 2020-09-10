@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\api;
 
-use Request as UrlRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Comment;
-use App\Http\Resources\Comment as CommentResource;
-use Auth;
+use App\Post;
 
 class CommentController extends Controller
 {
@@ -24,21 +22,14 @@ class CommentController extends Controller
      */
 
 
-    public function index()
+    public function index($post_id)
     {
 
-        $comments = Comment::orderBy('created_at', 'desc')->paginate(100);
-        return CommentResource::collection($comments);
-    }
+        $post = Post::FindOrFail($post_id);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $comments = $post->comments()->orderBy('created_at', 'desc')->paginate(100);
+        
+        return $comments;
     }
 
     /**
@@ -47,15 +38,21 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $post_id)
     {
-        $comment = new Comment;
-        $comment->content = $request->content;
-        $comment->post_id = $request->post;
-        $comment->user_id = Auth::user()->id;
-        $comment->save();
 
-        return response()->json(['message' => 'Comment successfully posted', 'id' => $comment->id]);
+        $post = Post::findOrFail($post_id);
+
+        $request->validate([
+            'content' => "required"
+        ]);
+
+        $comment = $post->comments()->create([
+            'user_id' => auth()->user()->id,
+            'content' => $request->content
+        ]);
+
+        return $comment;
     }
 
     /**
@@ -67,31 +64,9 @@ class CommentController extends Controller
     public function show($id)
     {
         $comment = Comment::findOrFail($id);
-        return new CommentResource($comment);
+        return $comment;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -106,6 +81,10 @@ class CommentController extends Controller
         {
             $comment->delete();
         }
-        return response()->json(['message' => 'Comment successfully deleted']);  
+        else
+        {
+            throw new AuthorizationException();
+        }
+        return response(null, 204);  
     }
 }

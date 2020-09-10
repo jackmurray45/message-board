@@ -5,9 +5,7 @@ namespace App\Http\Controllers\api;
 use Request as UrlRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\Post as PostResource;
 use App\Post;
-use Auth;
 
 
 class PostController extends Controller
@@ -27,17 +25,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        return PostResource::collection($posts); 
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-
+        return $posts; 
     }
 
     /**
@@ -53,12 +41,11 @@ class PostController extends Controller
             'content' => 'required'
         ]);
 
-        $post = new Post;
-        $post->user_id = Auth::user()->id;
-        $post->content = $request->content;
-        $post->save();
+        $post = auth()->user()->posts()->create([
+            'content' => $request->content
+        ]);
 
-        return response()->json(['message' => 'Post successfully sent', 'id' => $post->id]);
+        return $post;
     }
 
     /**
@@ -67,21 +54,14 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $post = Post::findOrFail($id);
-        return new PostResource($post);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if($request->user == 1)
+        {
+            $post->user;
+        }
+        return $post;
     }
 
     /**
@@ -105,17 +85,15 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
-        if(isset($post) && $post->user_id == Auth::user()->id)
+        if($post->user_id == auth()->user()->id)
         {
             $post->delete();
         }
-        return response()->json(['message' => 'Post successfully deleted']);
+        else
+        {
+            throw new AuthorizationException();
+        }
+        return response(null, 204);
     }
 
-    public function followingPosts()
-    {
-        $posts = Post::select('posts.*')->join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
-        ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
-        return new PostResource($posts);
-    }
 }
