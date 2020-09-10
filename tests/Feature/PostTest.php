@@ -54,7 +54,7 @@ class PostTest extends TestCase
             'content' => 'This is test content'
         ]);
 
-        $response->assertRedirect('/posts');
+        $response->assertRedirect("/posts/1");
         $this->assertEquals(1, Post::count());
     }
 
