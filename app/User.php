@@ -91,7 +91,7 @@ class User extends Authenticatable implements JWTSubject
             'following_user_id',
             'user_id',
             'id',
-            'following_user_id'
+            'followed_user_id'
         );
     }
 
