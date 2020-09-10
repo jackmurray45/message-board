@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\web;
 
-use Request as UrlRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\Post as PostResource;
@@ -29,15 +28,9 @@ class PostController extends Controller
     public function index(Request $request)
     {
 
-        if($request->following == 1)
-        {
-            $posts = Post::join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
-            ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
-        }
-        else
-        {
-            $posts = Post::orderBy('created_at', 'DESC')->paginate(20);
-        }
+        $posts = !auth()->guest() && $request->following == 1 ? 
+            auth()->user()->followingPosts()->paginate(20) : 
+            Post::orderBy('created_at', 'DESC')->paginate(20);
 
         return inertia('Posts', [
             'posts' => $posts
