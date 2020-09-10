@@ -14,7 +14,6 @@ class Comment extends Model
      *
      * @var array
      */
-    protected $with = ['post', 'user'];
 
     public function post()
     {
