@@ -28,7 +28,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
 
-        $users = $request->following == 1 ? 
+        $users = !auth()->guest() && $request->following == 1 ? 
             auth()->user()->following()->paginate(20) : 
             User::orderBy('created_at', 'DESC')->paginate(20);
                 
