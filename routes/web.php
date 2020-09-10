@@ -14,7 +14,6 @@
 Route::get('/', 'web\HomeController@index');
 
 //Post routes
-Route::get('posts/following', 'web\PostController@followingPosts');
 Route::resource('posts', 'web\PostController');
 
 //Profile routes
