@@ -38,7 +38,7 @@ class CommentTest extends TestCase
         
         
 
-        $this->assertEquals(Comment::count(), 1);
+        $this->assertEquals(1, Comment::count());
     }
 
     public function testDeleteComment()
@@ -47,9 +47,9 @@ class CommentTest extends TestCase
         $post = factory(Post::class)->create();
         $comment = factory(Comment::class)->create();
 
-        $this->assertEquals(Comment::count(), 1);
+        $this->assertEquals(1, Comment::count());
         $response = $this->actingAs($user)->delete("/comments/$comment->id");
-        $this->assertEquals(Comment::count(), 0);
+        $this->assertEquals(0, Comment::count());
     }
 
     public function testFailedDeleteComment()
@@ -59,9 +59,9 @@ class CommentTest extends TestCase
         $comment = factory(Comment::class)->create();
         $user2 = factory(User::class)->create();
 
-        $this->assertEquals(Comment::count(), 1);
+        $this->assertEquals(1, Comment::count());
         $response = $this->actingAs($user2)->delete("/comments/$post->id");
-        $this->assertEquals(Comment::count(), 1);
+        $this->assertEquals(1, Comment::count());
     }
 
 

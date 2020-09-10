@@ -55,7 +55,7 @@ class PostTest extends TestCase
         ]);
 
         $response->assertRedirect('/posts');
-        $this->assertEquals(Post::count(), 1);
+        $this->assertEquals(1, Post::count());
     }
 
     public function testDeletePost()
@@ -63,9 +63,9 @@ class PostTest extends TestCase
         $user = factory(User::class)->create();
         $post = factory(Post::class)->create();
 
-        $this->assertEquals(Post::count(), 1);
+        $this->assertEquals(1, Post::count());
         $response = $this->actingAs($user)->delete("/posts/$post->id");
-        $this->assertEquals(Post::count(), 0);
+        $this->assertEquals(0, Post::count());
     }
 
     public function testFailedDeletePost()
@@ -74,8 +74,8 @@ class PostTest extends TestCase
         $post = factory(Post::class)->create();
         $user2 = factory(User::class)->create();
 
-        $this->assertEquals(Post::count(), 1);
+        $this->assertEquals(1, Post::count());
         $response = $this->actingAs($user2)->delete("/posts/$post->id");
-        $this->assertEquals(Post::count(), 1);
+        $this->assertEquals(1, Post::count());
     }
 }

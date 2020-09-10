@@ -66,8 +66,8 @@ class UserTest extends TestCase
             'email' => $user->email,
             'bio' => 'Test Bio'
         ]);
-        $this->assertEquals(User::find(1)->bio, 'Test Bio'); 
-        $response->assertStatus(302);
+        $this->assertEquals('Test Bio', User::find(1)->bio); 
+        $response->assertStatus(200);
     }
 
     public function testFailedUpdateMyProfile()
@@ -79,7 +79,7 @@ class UserTest extends TestCase
             'email' => $user->email,
             'bio' => $user2->bio
         ]);
-        $this->assertEquals(User::find(1)->bio, $user->bio);
+        $this->assertEquals($user->bio, User::find(1)->bio);
     }
 
     public function testDuplicateEmails()
@@ -94,7 +94,7 @@ class UserTest extends TestCase
         ]);
 
         //$user2's email should not have changed
-        $this->assertEquals(User::find(2)->email, $user2->email);
+        $this->assertEquals($user2->email, User::find(2)->email);
 
         $response->assertStatus(302);
     }
@@ -104,34 +104,19 @@ class UserTest extends TestCase
         $user1 = factory(User::class)->create();
         $user2 = factory(User::class)->create();
 
-        $response = $this->actingAs($user1)->post("/profiles", [
-            'user' => $user2->id,
-        ]);
+        $response = $this->actingAs($user1)->post("/profiles/{$user2->id}/follow");
 
-        $this->assertEquals(Follow::count(), 1);
+        $this->assertEquals(1, Follow::count());
     }
 
-    public function testFailedFollow()
+    public function testCantFollowSelf()
     {
         $user = factory(User::class)->create();
 
-        $response = $this->post("/profiles", [
-            'user' => $user->id,
-        ]);
+        $response = $this->post("/profiles/{$user->id}/follow");
 
-        $this->assertEquals(Follow::count(), 0);
+        $this->assertEquals(0, Follow::count());
         $response->assertRedirect('/login');
-    }
-
-    public function testFollowingSelf()
-    {
-        $user = factory(User::class)->create();
-
-        $response = $this->actingAs($user)->post("/profiles", [
-            'user' => $user->id,
-        ]);
-
-        $this->assertEquals(Follow::count(), 0);
     }
 
     public function testDeleteFollowFail()
@@ -139,13 +124,11 @@ class UserTest extends TestCase
         $user1 = factory(User::class)->create();
         $user2 = factory(User::class)->create();
 
-        $response = $this->actingAs($user1)->post("/profiles", [
-            'user' => $user2->id,
-        ]);
+        $response = $this->actingAs($user1)->post("/profiles/{$user2->id}/follow");
 
-        $this->assertEquals(Follow::count(), 1);
-        $response = $this->actingAs($user1)->delete("/profiles/1");
-        $this->assertEquals(Follow::count(), 1);
+        $this->assertEquals(1, Follow::count());
+        $response = $this->actingAs($user1)->delete("/profiles/1/follow");
+        $this->assertEquals(1, Follow::count());
 
     }
 
@@ -154,13 +137,11 @@ class UserTest extends TestCase
         $user1 = factory(User::class)->create();
         $user2 = factory(User::class)->create();
 
-        $response = $this->actingAs($user1)->post("/profiles", [
-            'user' => $user2->id,
-        ]);
+        $response = $this->actingAs($user1)->post("/profiles/{$user2->id}/follow");
 
-        $this->assertEquals(Follow::count(), 1);
-        $response = $this->actingAs($user1)->delete("/profiles/".$user2->id);
-        $this->assertEquals(Follow::count(), 0);
+        $this->assertEquals(1, Follow::count());
+        $response = $this->actingAs($user1)->delete("/profiles/{$user2->id}/follow");
+        $this->assertEquals(0, Follow::count());
 
     }
 
@@ -169,13 +150,11 @@ class UserTest extends TestCase
         $user1 = factory(User::class)->create();
         $user2 = factory(User::class)->create();
 
-        $response = $this->actingAs($user1)->post("/profiles", [
-            'user' => $user2->id,
-        ]);
+        $response = $this->actingAs($user1)->post("/profiles/{$user2->id}/follow");
 
-        $this->assertEquals(Follow::count(), 1);
-        $response = $this->actingAs($user2)->delete("/profiles/1");
-        $this->assertEquals(Follow::count(), 1);
+        $this->assertEquals(1, Follow::count());
+        $response = $this->actingAs($user2)->delete("/profiles/{$user1->id}/follow");
+        $this->assertEquals(1, Follow::count());
 
     }
     

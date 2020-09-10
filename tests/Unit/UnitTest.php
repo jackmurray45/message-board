@@ -23,7 +23,7 @@ class UnitTest extends TestCase
     public function testCreateUser()
     {
         factory(User::class)->create();   //create faker data
-        $this->assertEquals(User::where('id', 1)->count(), 1); 
+        $this->assertEquals(1, User::where('id', 1)->count()); 
     }
 
     public function testDuplicateEmail()
@@ -50,7 +50,7 @@ class UnitTest extends TestCase
         $data = factory(User::class)->create();
         /*try to delete email of user generated from $data
         must limit to id < 101 to exclude $data from query*/
-        $this->assertEquals(User::where('id','<' ,101)->where('email',$data->email)->delete(), 0); 
+        $this->assertEquals(0, User::where('id','<' ,101)->where('email',$data->email)->delete()); 
     }
 
     public function testDeleteUserWithPosts()
@@ -64,16 +64,16 @@ class UnitTest extends TestCase
         //echo "post count: ".Post::count();
         
         //Check user and posts were made
-        $this->assertEquals(Post::count(), 1);
-        $this->assertEquals(User::count(),  1);
+        $this->assertEquals(1, Post::count());
+        $this->assertEquals(1, User::count());
 
         //Delete user and posts assoicated with user
         User::find($data)->delete();
         Post::where('user_id', $data)->delete();
 
         //Make sure posts were deleted
-        $this->assertEquals(Post::count(), 0);
-        $this->assertEquals(User::count(), 0);
+        $this->assertEquals(0, Post::count());
+        $this->assertEquals(0, User::count());
         
     }
     
@@ -90,9 +90,9 @@ class UnitTest extends TestCase
         $comment = factory(Comment::class)->create();
 
         //Check user and posts were made
-        $this->assertEquals(User::count(),  1);
-        $this->assertEquals(Post::count(), 1);
-        $this->assertEquals(Comment::count(), 1);
+        $this->assertEquals(1, User::count());
+        $this->assertEquals(1, Post::count());
+        $this->assertEquals(1, Comment::count());
 
         //Delete user and posts/comments assoicated with user
         User::find($data)->delete();
@@ -100,9 +100,9 @@ class UnitTest extends TestCase
         Comment::where('user_id', $data)->delete();
 
         //Make sure posts were deleted
-        $this->assertEquals(Post::count(), 0);
-        $this->assertEquals(User::count(), 0);
-        $this->assertEquals(Comment::count(), 0);
+        $this->assertEquals(0, Post::count());
+        $this->assertEquals(0, User::count());
+        $this->assertEquals(0, Comment::count());
     }
 
     public function testFollowUser()
@@ -113,7 +113,7 @@ class UnitTest extends TestCase
 
         $this->assertTrue($follow->following_user_id == $user1->id || $follow->following_user_id == $user2->id);
         $this->assertTrue($follow->followed_user_id == $user1->id || $follow->followed_user_id == $user2->id);
-        $this->assertEquals(Follow::count(), 1);
+        $this->assertEquals(1, Follow::count());
 
     }
  
