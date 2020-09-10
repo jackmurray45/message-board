@@ -4,20 +4,12 @@ namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\Post as PostResource;
+use App\Exceptions\AuthorizationException;
 use App\Post;
-use Auth;
 
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    
 
     public function __construct()
     {
@@ -25,12 +17,17 @@ class PostController extends Controller
         $this->middleware('check.following', ['index']);
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
 
         $posts = !auth()->guest() && $request->following == 1 ? 
-            auth()->user()->followingPosts()->paginate(20) : 
-            Post::orderBy('created_at', 'DESC')->paginate(20);
+            auth()->user()->followingPosts()->with('user')->paginate(20) : 
+            Post::with('user')->orderBy('created_at', 'DESC')->paginate(20);
 
         return inertia('Posts', [
             'posts' => $posts
@@ -58,17 +55,16 @@ class PostController extends Controller
     {
 
         $request->validate([
-            'content' => "required"
+            'content' => 'required'
         ]);
 
         
-        $post = new Post;
-        $post->user_id = Auth::user()->id;
-        $post->content = $request->content;
-        $post->save();
 
-        session()->flash('status', 'Post successfully sent!');
-        return redirect('/posts');
+        $post = auth()->user()->posts()->create([
+            'content' => $request->content
+        ]);
+
+        return redirect("/posts/{$post->id}");
 
     }
 
@@ -80,7 +76,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::with('user')->findOrFail($id);
 
         $comments = $post->comments()->paginate(10);
         return inertia('Post', [
@@ -121,19 +117,15 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
-        if(isset($post) && $post->user_id == Auth::user()->id)
+        if($post->user_id == auth()->user()->id)
         {
             $post->delete();
-            session()->flash('status', 'Post successfully deleted!');
         }
-        $previousPath = explode('/', url()->previous());
-        return is_numeric(end($previousPath)) ? redirect('/posts')  : back();
+        else
+        {
+            throw new AuthorizationException();
+        }
+        return redirect('/posts');
     }
 
-    public function followingPosts()
-    {
-        $posts = Post::select('posts.*')->join('follows', 'posts.user_id', '=', 'follows.followed_user_id')
-        ->where('following_user_id', '=', Auth::user()->id)->orderBy('posts.created_at', 'DESC')->paginate(20);
-        return view('post.index')->with('posts', $posts)->with('followingPosts', 1);
-    }
 }

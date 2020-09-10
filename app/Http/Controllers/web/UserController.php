@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Hash;
 use Illuminate\Validation\ValidationException;
+use App\Exceptions\AuthorizationException;
 use App\Helpers\ImageHelper;
 
 
@@ -31,7 +32,7 @@ class UserController extends Controller
         $users = !auth()->guest() && $request->following == 1 ? 
             auth()->user()->following()->paginate(20) : 
             User::orderBy('created_at', 'DESC')->paginate(20);
-                
+        
         return inertia('Profiles', [
             'profiles' => $users,
         ]);
@@ -65,7 +66,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        $posts = $user->posts()->orderBy('created_at', 'DESC')->paginate(10);
+        $posts = $user->posts()->with('user')->orderBy('created_at', 'DESC')->paginate(10);
 
         return inertia('Profile', [
             'profile' => $user,
@@ -96,9 +97,17 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        $user->delete();
+        $user = User::findOrFail($id);
+        if(auth()->user()->id == $user->id)
+        {
+            $user->delete();
+        }
+        else
+        {
+            throw new AuthorizationException();
+        }
 
         return redirect('/');
     }
