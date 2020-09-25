@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use Request as UrlRequest;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use App\Post;
 

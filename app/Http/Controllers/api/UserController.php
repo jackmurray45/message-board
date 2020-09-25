@@ -36,6 +36,13 @@ class UserController extends Controller
     public function followUser($id)
     {
 
+        if (auth()->user()->id == $id) {
+            throw ValidationException::withMessages([
+                'Can not follow self.'
+            ]);
+            
+        }
+
         auth()->user()->following()->syncWithoutDetaching($id);
 
         return response(null, 204);
@@ -44,6 +51,13 @@ class UserController extends Controller
 
     public function unfollowUser($id)
     {
+
+        if (!auth()->user()->following()->where('followed_user_id', $id)->exists()) {
+            throw ValidationException::withMessages([
+                'Not following user.'
+            ]);
+            
+        }
 
         auth()->user()->following()->detach($id);
 

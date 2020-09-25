@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Access\AuthorizationException;
 use App\Comment;
 use App\Post;
 
@@ -76,8 +77,10 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
+
         $comment = Comment::find($id);
-        if(Auth::user()->id == $comment->user_id)
+
+        if(auth()->user()->id == $comment->user_id)
         {
             $comment->delete();
         }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Exceptions\AuthorizationException;
+use Illuminate\Auth\Access\AuthorizationException;
 use App\Post;
 
 
