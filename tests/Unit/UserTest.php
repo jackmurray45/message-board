@@ -11,11 +11,8 @@ use App\Follow;
 use App\Post;
 use App\Comment;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
-use Faker\Factory as Faker;
 
-
-class UnitTest extends TestCase
+class UserTest extends TestCase
 {
 
     use DatabaseMigrations;
@@ -60,8 +57,6 @@ class UnitTest extends TestCase
             ->each(function($user) {
                 $user->posts()->save(factory(Post::class)->make());
             });
-
-        //echo "post count: ".Post::count();
         
         //Check user and posts were made
         $this->assertEquals(1, Post::count());
